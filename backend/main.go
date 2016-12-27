@@ -51,13 +51,13 @@ func main() {
 	router.HandleFunc("/webhook", WebhookHandler).Methods("POST");
 
 	// parts "api" routes
-	api := router.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/part/{partId}", PartHandler).Methods("GET")
-	api.HandleFunc("/part/{partId}", PartDeleteHandler).Methods("DELETE")
-	api.HandleFunc("/part/{partId}/label", PartLabelHandler).Methods("GET")
-	api.HandleFunc("/parts", PartCreateHandler).Methods("POST")
-	api.HandleFunc("/parts", PartsIndexHandler).Methods("GET")
-	api.HandleFunc("/part/{partId}", PartUpdateHandler).Methods("PUT")
+	// api := router.PathPrefix("/api").Subrouter()
+	// api.HandleFunc("/part/{partId}", PartHandler).Methods("GET")
+	// api.HandleFunc("/part/{partId}", PartDeleteHandler).Methods("DELETE")
+	// api.HandleFunc("/part/{partId}/label", PartLabelHandler).Methods("GET")
+	// api.HandleFunc("/parts", PartCreateHandler).Methods("POST")
+	// api.HandleFunc("/parts", PartsIndexHandler).Methods("GET")
+	// api.HandleFunc("/part/{partId}", PartUpdateHandler).Methods("PUT")
 
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
