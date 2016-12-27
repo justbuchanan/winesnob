@@ -97,13 +97,11 @@ type ActionRequest struct {
 			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
 			WebhookUsed               string `json:"webhookUsed"`
 		} `json:"metadata"`
-		Parameters struct {
-			Color string `json:"color"`
-		} `json:"parameters"`
-		ResolvedQuery string  `json:"resolvedQuery"`
-		Score         float64 `json:"score"`
-		Source        string  `json:"source"`
-		Speech        string  `json:"speech"`
+		Parameters    map[string]interface{} `json:"parameters"`
+		ResolvedQuery string                 `json:"resolvedQuery"`
+		Score         float64                `json:"score"`
+		Source        string                 `json:"source"`
+		Speech        string                 `json:"speech"`
 	} `json:"result"`
 	SessionID string `json:"sessionId"`
 	Status    struct {
@@ -128,8 +126,8 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	resp.DisplayText = "what is this for?"
 
 	intent := req.Result.Metadata.IntentName
-	if intent == "list.menu" {
-		color := req.Result.Parameters.Color
+	if intent == "wine.list" {
+		color := req.Result.Parameters["wine-type"]
 		if color == "" {
 			resp.Speech = "listing all wines"
 		} else if color == "red" {
@@ -138,6 +136,16 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 			resp.Speech = "listing only white wines"
 		} else {
 			resp.Speech = "Unknown wine type"
+		}
+	} else if intent == "wine.describe" {
+		wineP := req.Result.Parameters["wine-descriptor"]
+		wine := wineP.(map[string]interface{})
+		year, present := wine["year"]
+		variety := wine["variety"].(string)
+		if present {
+			resp.Speech = "The " + strconv.FormatInt(int64(year.(float64)), 10) + " " + variety + " is all about flavor"
+		} else {
+			resp.Speech = "In the fields of tuscany..., the " + variety + " was invented"
 		}
 	}
 
