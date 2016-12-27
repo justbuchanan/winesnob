@@ -67,8 +67,18 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
 }
 
-func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+type ActionResponse struct {
+	Speech string `json:"speech"`
+	DisplayText string `json:"displayText"`
+}
 
+func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+	var resp ActionResponse
+	resp.Speech = "hello there!"
+	resp.DisplayText = "what is this for?"
+
+	// w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp)
 }
 
 // Random generation borrowed from here:
