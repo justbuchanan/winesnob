@@ -1,21 +1,22 @@
 package main
 
 import (
-	"flag"
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
-	"math/rand"
+	"time"
 
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -48,7 +49,7 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/webhook", WebhookHandler).Methods("POST");
+	router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
 
 	// parts "api" routes
 	// api := router.PathPrefix("/api").Subrouter()
@@ -64,20 +65,83 @@ func main() {
 
 	fmt.Println("Inventory api listening on port 8080")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
 }
 
 type ActionResponse struct {
-	Speech string `json:"speech"`
+	Speech      string `json:"speech"`
 	DisplayText string `json:"displayText"`
+	Data        struct {
+	} `json:"data"`
+	ContextOut []string `json:"contextOut"`
+	Source     string   `json:"source"`
+}
+
+type ActionRequest struct {
+	ID              string      `json:"id"`
+	OriginalRequest interface{} `json:"originalRequest"`
+	Result          struct {
+		Action           string        `json:"action"`
+		ActionIncomplete bool          `json:"actionIncomplete"`
+		Contexts         []interface{} `json:"contexts"`
+		Fulfillment      struct {
+			Messages []struct {
+				Speech string `json:"speech"`
+				Type   int    `json:"type"`
+			} `json:"messages"`
+			Speech string `json:"speech"`
+		} `json:"fulfillment"`
+		Metadata struct {
+			IntentID                  string `json:"intentId"`
+			IntentName                string `json:"intentName"`
+			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
+			WebhookUsed               string `json:"webhookUsed"`
+		} `json:"metadata"`
+		Parameters struct {
+			Color string `json:"color"`
+		} `json:"parameters"`
+		ResolvedQuery string  `json:"resolvedQuery"`
+		Score         float64 `json:"score"`
+		Source        string  `json:"source"`
+		Speech        string  `json:"speech"`
+	} `json:"result"`
+	SessionID string `json:"sessionId"`
+	Status    struct {
+		Code      int    `json:"code"`
+		ErrorType string `json:"errorType"`
+	} `json:"status"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var req ActionRequest
+	err := decoder.Decode(&req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Invalid request")
+		return
+	}
+
 	var resp ActionResponse
 	resp.Speech = "hello there!"
 	resp.DisplayText = "what is this for?"
 
-	// w.WriteHeader(http.StatusCreated)
+	intent := req.Result.Metadata.IntentName
+	if intent == "list.menu" {
+		color := req.Result.Parameters.Color
+		if color == "" {
+			resp.Speech = "listing all wines"
+		} else if color == "red" {
+			resp.Speech = "listing only red wines"
+		} else if color == "white" {
+			resp.Speech = "listing only white wines"
+		} else {
+			resp.Speech = "Unknown wine type"
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
 
@@ -223,7 +287,7 @@ func PartLabelHandler(w http.ResponseWriter, r *http.Request) {
 	// generate label using python script
 	dir, _ := os.Getwd()
 	fmt.Println(dir)
-	cmd := exec.Command(dir + "/dymo-labelgen/main.py",
+	cmd := exec.Command(dir+"/dymo-labelgen/main.py",
 		part.Brief,
 		"https://inventory.justbuchanan.com/part/"+part.Id,
 		"--bbox",
@@ -254,7 +318,7 @@ func PartLabelHandler(w http.ResponseWriter, r *http.Request) {
 
 	// set header info
 	w.Header().Set("Content-Type", "application/pdf")
-	w.Header().Set("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+	w.Header().Set("Content-Disposition", "attachment; filename=\""+filename+"\"")
 	w.Header().Set("Content-Length", strconv.FormatInt(pdfSize, 10))
 
 	// write pdf to http response
