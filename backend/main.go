@@ -48,6 +48,8 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
+	router.HandleFunc("/webhook", WebhookHandler).Methods("POST");
+
 	// parts "api" routes
 	api := router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/part/{partId}", PartHandler).Methods("GET")
@@ -63,6 +65,10 @@ func main() {
 	fmt.Println("Inventory api listening on port 8080")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 	log.Fatal(http.ListenAndServe(":8080", loggedRouter))
+}
+
+func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+
 }
 
 // Random generation borrowed from here:
