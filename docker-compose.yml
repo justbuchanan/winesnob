@@ -1,0 +1,7 @@
+---
+wine:
+    build: /home/justin/winesnob/
+    environment:
+        - VIRTUAL_HOST=winesnob.justbuchanan.com
+        - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
+        - LETSENCRYPT_HOST=winesnob.justbuchanan.com
