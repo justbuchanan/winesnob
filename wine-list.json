@@ -1,0 +1,21 @@
+[
+    {
+        "name": "RJ Spagnols En Primeur Italian Amarone",
+        "variety": "amarone",
+        "red": true,
+        "year": 2014,
+        "description": "This is an assertively full-bodied wine with a delectable nose of black cherries, dark chocolate and well balanced oak. It offers ripe dark fruit flavours cradled by firm tannins culminating in an almost endless finish."
+    },
+    {
+        "variety": "super tuscan",
+        "red": true,
+        "year": 2016,
+        "description": "Tuscany is home to some of the world's most notable wine regions. Its soil and weather conditions are ideal for grape growing and have long fostered production of the unique Super Tuscan wine style. Balanced acidity and a velvety mouthfeel best describe the En Primeur Super Tuscan. With bursting flavors of plum, cassis, cherry, and red currant, the Super Tuscan also offers subtle notes of leather, spice, and licorice. It pairs perfectly with traditional Italian dishes like tomato-based pasta dishes and buttery roasted game, or try it with an herbed mushroom and white bean salad."
+    },
+    {
+        "variety": "chardonnay",
+        "name": "Eclipse Sonoma Dry Creek Chardonnay",
+        "year": 2012,
+        "description": "A fresh, well-balanced wine with typical Chardonnay characteristics of tropical citrus aromas and flavors. Undimmed by oak, the fruit quality of these grapes is allowed to come through, and the rich, round mouthfeel lingers to a long, crisp finish.",
+    }
+]
