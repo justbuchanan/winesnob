@@ -35,12 +35,7 @@ var db *gorm.DB
 func main() {
 	// TODO: seed rng
 
-	var err error
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
+	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
 	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
 	flag.Parse()
 
@@ -53,6 +48,28 @@ func main() {
 
 	// setup schema
 	db.AutoMigrate(&WineInfo{})
+
+
+	if *loadSamples == true {
+		wines, err := ReadWines("wine-list.json")
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+
+		// insert into database
+		for _, wine := range wines {
+			wine.Id = GenerateUniqueId()
+			err = db.Create(&wine).Error
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+		}
+
+		fmt.Println("Loaded sample wines")
+	}
+
 
 	router := mux.NewRouter().StrictSlash(true)
 
