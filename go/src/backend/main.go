@@ -31,6 +31,7 @@ type WineInfo struct {
 	Description string `json:"description"`
 	Year        int64  `json:"year"`
 	Red         bool   `json:"red"`
+	Available bool `json:"available"`
 }
 
 type Part struct {
@@ -145,7 +146,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		color := req.Result.Parameters["wine-type"]
 		var wineNames []string
 		for _, elem := range allWines {
-			if color == "" || (color == "red" == elem.Red) {
+			if (color == "" || (color == "red" == elem.Red)) && elem.Available {
 				wineNames = append(wineNames, elem.Variety)
 			}
 		}
