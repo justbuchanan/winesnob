@@ -2,3 +2,8 @@ md-toolbar {
     background: #722f37;
     color: white;
 }
+
+a[md-button] {
+    background: #DECB90;
+    color: #722f37;
+}
