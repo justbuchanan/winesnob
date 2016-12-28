@@ -162,7 +162,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if intent == "wine.list" {
 		color := req.Result.Parameters["wine-type"]
 		if color == "" {
-			resp.Speech = "listing all wines"
+			resp.Speech = "We have an italian amarone, a cabernet, and a chardonnay"
 		} else if color == "red" {
 			resp.Speech = "listing only red wines"
 		} else if color == "white" {
