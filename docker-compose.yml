@@ -5,3 +5,5 @@ wine:
         - VIRTUAL_HOST=winesnob.justbuchanan.com
         - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
         - LETSENCRYPT_HOST=winesnob.justbuchanan.com
+    volumes:
+      - /home/justin/winery-data:/data
