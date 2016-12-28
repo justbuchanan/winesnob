@@ -12,7 +12,9 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"time"
+	// "time"
+	// "apiai"
+	"backend/apiai"
 
 	"encoding/json"
 	"github.com/gorilla/handlers"
@@ -63,53 +65,11 @@ func main() {
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
 
-	fmt.Println("Inventory api listening on port 8080")
+	fmt.Println("Winesnob listening on port 8080")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
 }
 
-type ActionResponse struct {
-	Speech      string `json:"speech"`
-	DisplayText string `json:"displayText"`
-	Data        struct {
-	} `json:"data"`
-	ContextOut []string `json:"contextOut"`
-	Source     string   `json:"source"`
-}
-
-type ActionRequest struct {
-	ID              string      `json:"id"`
-	OriginalRequest interface{} `json:"originalRequest"`
-	Result          struct {
-		Action           string        `json:"action"`
-		ActionIncomplete bool          `json:"actionIncomplete"`
-		Contexts         []interface{} `json:"contexts"`
-		Fulfillment      struct {
-			Messages []struct {
-				Speech string `json:"speech"`
-				Type   int    `json:"type"`
-			} `json:"messages"`
-			Speech string `json:"speech"`
-		} `json:"fulfillment"`
-		Metadata struct {
-			IntentID                  string `json:"intentId"`
-			IntentName                string `json:"intentName"`
-			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
-			WebhookUsed               string `json:"webhookUsed"`
-		} `json:"metadata"`
-		Parameters    map[string]interface{} `json:"parameters"`
-		ResolvedQuery string                 `json:"resolvedQuery"`
-		Score         float64                `json:"score"`
-		Source        string                 `json:"source"`
-		Speech        string                 `json:"speech"`
-	} `json:"result"`
-	SessionID string `json:"sessionId"`
-	Status    struct {
-		Code      int    `json:"code"`
-		ErrorType string `json:"errorType"`
-	} `json:"status"`
-	Timestamp time.Time `json:"timestamp"`
-}
 
 type WineInfo struct {
 	Name        string `json:"name"`
@@ -146,7 +106,7 @@ func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var req ActionRequest
+	var req apiai.ActionRequest
 	err := decoder.Decode(&req)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -154,7 +114,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp ActionResponse
+	var resp apiai.ActionResponse
 	resp.Speech = "hello there!"
 	resp.DisplayText = "what is this for?"
 

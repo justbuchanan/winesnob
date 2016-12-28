@@ -5,14 +5,15 @@ RUN pacman -S --noconfirm nodejs npm gcc python python-pip go git
 # RUN npm install -g angular-cli
 # RUN ng version
 
-ENV GOPATH $HOME/go
+RUN mkdir /winesnob
+WORKDIR /winesnob
+
+RUN mkdir -p go/src
+ENV GOPATH=/winesnob/go
 RUN go get github.com/gorilla/mux \
     github.com/gorilla/handlers \
     github.com/jinzhu/gorm \
     github.com/jinzhu/gorm/dialects/sqlite
-
-RUN mkdir inventory
-WORKDIR inventory
 
 # COPY dymo-labelgen ./dymo-labelgen
 # RUN pip install -r dymo-labelgen/requirements.txt
@@ -21,7 +22,9 @@ WORKDIR inventory
 # RUN npm install
 
 COPY wine-list.json ./
-COPY backend ./backend
+
+WORKDIR go/src/
+COPY go/src/backend ./backend
 
 # copy frontend files and compile, resulting in a statically-servable "dist" directory
 # COPY protractor.conf.js tslint.json karma.conf.js angular-cli.json ./
