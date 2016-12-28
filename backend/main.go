@@ -111,6 +111,39 @@ type ActionRequest struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
+type WineInfo struct {
+	Name        string `json:"name"`
+	Variety     string `json:"variety"`
+	Description string `json:"description"`
+	Year        int64  `json:"year"`
+	Red         bool   `json:"red"`
+}
+
+func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
+	wines := make([]WineInfo, 4)
+	file, err := ioutil.ReadFile("wine-list.json")
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	err = json.Unmarshal(file, &wines)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	fmt.Println(wines)
+	for _, wine := range wines {
+		if wine.Variety == descriptor["variety"].(string) {
+			fmt.Println("found it!")
+			return &wine
+		}
+		fmt.Println("variety = ", wine.Variety)
+	}
+
+	return nil
+}
+
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req ActionRequest
@@ -138,14 +171,12 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 			resp.Speech = "Unknown wine type"
 		}
 	} else if intent == "wine.describe" {
-		wineP := req.Result.Parameters["wine-descriptor"]
-		wine := wineP.(map[string]interface{})
-		year, present := wine["year"]
-		variety := wine["variety"].(string)
-		if present {
-			resp.Speech = "The " + strconv.FormatInt(int64(year.(float64)), 10) + " " + variety + " is all about flavor"
+		wineP := req.Result.Parameters["wine-descriptor"].(map[string]interface{})
+		wine := WineDescriptorLookup(wineP)
+		if wine != nil {
+			resp.Speech = wine.Description
 		} else {
-			resp.Speech = "In the fields of tuscany..., the " + variety + " was invented"
+			resp.Speech = "I'm sorry, I couldn't find a wine matching that description"
 		}
 	}
 

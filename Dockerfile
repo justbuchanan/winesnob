@@ -20,6 +20,7 @@ WORKDIR inventory
 # COPY package.json ./
 # RUN npm install
 
+COPY wine-list.json ./
 COPY backend ./backend
 
 # copy frontend files and compile, resulting in a statically-servable "dist" directory

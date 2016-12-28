@@ -7,6 +7,7 @@
         "description": "This is an assertively full-bodied wine with a delectable nose of black cherries, dark chocolate and well balanced oak. It offers ripe dark fruit flavours cradled by firm tannins culminating in an almost endless finish."
     },
     {
+        "name": "something...",
         "variety": "super tuscan",
         "red": true,
         "year": 2016,
@@ -14,8 +15,9 @@
     },
     {
         "variety": "chardonnay",
+        "red": false,
         "name": "Eclipse Sonoma Dry Creek Chardonnay",
         "year": 2012,
-        "description": "A fresh, well-balanced wine with typical Chardonnay characteristics of tropical citrus aromas and flavors. Undimmed by oak, the fruit quality of these grapes is allowed to come through, and the rich, round mouthfeel lingers to a long, crisp finish.",
+        "description": "A fresh, well-balanced wine with typical Chardonnay characteristics of tropical citrus aromas and flavors. Undimmed by oak, the fruit quality of these grapes is allowed to come through, and the rich, round mouthfeel lingers to a long, crisp finish."
     }
 ]
