@@ -144,7 +144,6 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		if len(wines) == 0 {
 			resp.Speech = "Sad day... it looks like we're dry!"
 		} else {
-
 			resp.Speech = "We have " + JoinWordSeries(wineNames) + "."
 		}
 

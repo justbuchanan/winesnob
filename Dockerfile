@@ -25,8 +25,7 @@ COPY go/src/backend ./go/src/backend
 # copy frontend files and compile, resulting in a statically-servable "dist" directory
 COPY protractor.conf.js tslint.json karma.conf.js angular-cli.json ./
 COPY src ./src
-# TODO: fix ng build
-RUN ng build --env=prod || true
+RUN ng build --env=prod
 
 VOLUME "/data"
 EXPOSE 8080
