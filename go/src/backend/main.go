@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/apiai"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -8,7 +9,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"backend/apiai"
 	"strings"
 
 	"encoding/json"
@@ -25,9 +25,9 @@ type WineInfo struct {
 	Description string `json:"description"`
 	Year        int64  `json:"year"`
 	Red         bool   `json:"red"`
-	Available bool `json:"available"`
+	Available   bool   `json:"available"`
 
-	Id          string `json:"id"`
+	Id string `json:"id"`
 }
 
 var db *gorm.DB
@@ -103,7 +103,7 @@ func ReadWines(filename string) (wines []WineInfo, err error) {
 
 func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
 	var wines []WineInfo
-	db.Find(&wines)	
+	db.Find(&wines)
 	for _, wine := range wines {
 		if wine.Variety == descriptor["variety"].(string) {
 			fmt.Println("found it!")
@@ -141,7 +141,13 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		resp.Speech = "We have " + JoinWordSeries(wineNames) + "."
+		if len(wines) == 0 {
+			resp.Speech = "Sad day... it looks like we're dry!"
+		} else {
+
+			resp.Speech = "We have " + JoinWordSeries(wineNames) + "."
+		}
+
 	} else if intent == "wine.describe" {
 		wineP := req.Result.Parameters["wine-descriptor"].(map[string]interface{})
 		wine := WineDescriptorLookup(wineP)
@@ -151,9 +157,9 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 			resp.Speech = "I'm sorry, I couldn't find a wine matching that description"
 		}
 	} else if intent == "wine.pair" {
-        food := req.Result.Parameters["food"].(string)
-        resp.Speech = "I'd recommend the amarone, it goes very well with " + food
-    }
+		food := req.Result.Parameters["food"].(string)
+		resp.Speech = "I'd recommend the amarone, it goes very well with " + food
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
