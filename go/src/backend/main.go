@@ -24,6 +24,14 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
+type WineInfo struct {
+	Name        string `json:"name"`
+	Variety     string `json:"variety"`
+	Description string `json:"description"`
+	Year        int64  `json:"year"`
+	Red         bool   `json:"red"`
+}
+
 type Part struct {
 	Id          string `json:"id"`
 	Brief       string `json:"brief"`
@@ -31,10 +39,18 @@ type Part struct {
 	Quantity    uint64 `json:"quantity"`
 }
 
+var allWines []WineInfo
 var db *gorm.DB
 
 func main() {
 	// TODO: seed rng
+
+	var err error
+	allWines, err = ReadWines("wine-list.json")
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
 	dbPath := flag.String("dbpath", "./parts.sqlite3db", "Path to sqlite3 database file")
 	flag.Parse()
@@ -71,29 +87,24 @@ func main() {
 }
 
 
-type WineInfo struct {
-	Name        string `json:"name"`
-	Variety     string `json:"variety"`
-	Description string `json:"description"`
-	Year        int64  `json:"year"`
-	Red         bool   `json:"red"`
-}
-
-func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
-	wines := make([]WineInfo, 4)
-	file, err := ioutil.ReadFile("wine-list.json")
+func ReadWines(filename string) (wines []WineInfo, err error) {
+	// wines := make([]WineInfo, 4)
+	var file []byte
+	file, err = ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	err = json.Unmarshal(file, &wines)
 	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		return nil, err
 	}
-	fmt.Println(wines)
-	for _, wine := range wines {
+
+	return wines, nil
+}
+
+func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
+	for _, wine := range allWines {
 		if wine.Variety == descriptor["variety"].(string) {
 			fmt.Println("found it!")
 			return &wine
@@ -121,14 +132,25 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	intent := req.Result.Metadata.IntentName
 	if intent == "wine.list" {
 		color := req.Result.Parameters["wine-type"]
-		if color == "" {
-			resp.Speech = "We have an italian amarone, a cabernet, and a chardonnay"
-		} else if color == "red" {
-			resp.Speech = "listing only red wines"
-		} else if color == "white" {
-			resp.Speech = "listing only white wines"
-		} else {
-			resp.Speech = "Unknown wine type"
+		var wineNames []string
+		for _, elem := range allWines {
+			if color == "" || (color == "red" == elem.Red) {
+				wineNames = append(wineNames, elem.Variety)
+			}
+		}
+		// if color == "" {
+		// 	resp.Speech = "We have an italian amarone, a cabernet, and a chardonnay"
+		// } else if color == "red" {
+		// 	resp.Speech = "listing only red wines"
+		// } else if color == "white" {
+		// 	resp.Speech = "listing only white wines"
+		// } else {
+		// 	resp.Speech = "Unknown wine type"
+		// }
+
+		resp.Speech = "We have "
+		for _, variety := range wineNames {
+			resp.Speech += variety + ", "
 		}
 	} else if intent == "wine.describe" {
 		wineP := req.Result.Parameters["wine-descriptor"].(map[string]interface{})

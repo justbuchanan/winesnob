@@ -10,7 +10,7 @@ WORKDIR /winesnob
 
 RUN mkdir -p go/src
 ENV GOPATH=/winesnob/go
-RUN go get github.com/gorilla/mux \
+RUN go get -u github.com/gorilla/mux \
     github.com/gorilla/handlers \
     github.com/jinzhu/gorm \
     github.com/jinzhu/gorm/dialects/sqlite
@@ -23,8 +23,7 @@ RUN go get github.com/gorilla/mux \
 
 COPY wine-list.json ./
 
-WORKDIR go/src/
-COPY go/src/backend ./backend
+COPY go/src/backend ./go/src/backend
 
 # copy frontend files and compile, resulting in a statically-servable "dist" directory
 # COPY protractor.conf.js tslint.json karma.conf.js angular-cli.json ./
@@ -34,4 +33,4 @@ COPY go/src/backend ./backend
 
 VOLUME "/data"
 EXPOSE 8080
-CMD ["go", "run", "backend/main.go", "--dbpath", "/data/parts.sqlite3db"]
+CMD ["go", "run", "go/src/backend/main.go", "--dbpath", "/data/parts.sqlite3db"]
