@@ -15,6 +15,7 @@ import (
 	// "time"
 	// "apiai"
 	"backend/apiai"
+	"strings"
 
 	"encoding/json"
 	"github.com/gorilla/handlers"
@@ -86,6 +87,16 @@ func main() {
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
 }
 
+// Similar to string Join(), but adds an "and" appropriately
+func JoinWordSeries(items []string) string {
+	if len(items) == 0 {
+		return ""
+	} else if len(items) == 1 {
+		return items[0]
+	} else {
+		return strings.Join(items[:len(items)-1], ", ") + ", and " + items[len(items)-1]
+	}
+}
 
 func ReadWines(filename string) (wines []WineInfo, err error) {
 	// wines := make([]WineInfo, 4)
@@ -138,20 +149,8 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 				wineNames = append(wineNames, elem.Variety)
 			}
 		}
-		// if color == "" {
-		// 	resp.Speech = "We have an italian amarone, a cabernet, and a chardonnay"
-		// } else if color == "red" {
-		// 	resp.Speech = "listing only red wines"
-		// } else if color == "white" {
-		// 	resp.Speech = "listing only white wines"
-		// } else {
-		// 	resp.Speech = "Unknown wine type"
-		// }
 
-		resp.Speech = "We have "
-		for _, variety := range wineNames {
-			resp.Speech += variety + ", "
-		}
+		resp.Speech = "We have " + JoinWordSeries(wineNames) + "."
 	} else if intent == "wine.describe" {
 		wineP := req.Result.Parameters["wine-descriptor"].(map[string]interface{})
 		wine := WineDescriptorLookup(wineP)
