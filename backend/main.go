@@ -178,7 +178,10 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			resp.Speech = "I'm sorry, I couldn't find a wine matching that description"
 		}
-	}
+	} else if intent == "wine.pair" {
+        food := req.Result.Parameters["food"].(string)
+        resp.Speech = "I'd recommend the amarone, it goes very well with " + food
+    }
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
