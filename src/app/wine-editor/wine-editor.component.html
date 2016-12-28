@@ -1,0 +1,25 @@
+
+<md-card *ngIf="wine">
+    <!-- <md-toolbar>Basic</md-toolbar> -->
+    <md-card-title> {{ isNewWine ? "Create Wine" : "Edit Wines" }}</md-card-title>
+<form (ngSubmit)="onSubmit()" #wineForm="ngForm">
+    <md-card-content>
+        <md-card-subtitle>{{ isNewWine ? "ID: TBD" : wine.id }}</md-card-subtitle>
+            <table style="width: 100%" cellspacing="0">
+                <tr><md-input [(ngModel)]="wine.name" required name="name" placeholder="RJ Spagnols Super Tuscan"></md-input></tr>
+                <tr><md-input [(ngModel)]="wine.variety" required name="variety" placeholder="super tuscan"></md-input></tr>
+                <tr><md-input [(ngModel)]="wine.description" name="description" placeholder="Description"></md-input></tr>
+                <tr><md-checkbox [(ngModel)]="wine.red" name="red">Red?</md-checkbox></tr>
+                <tr><md-checkbox [(ngModel)]="wine.available" name="available">Available?</md-checkbox></tr>
+            </table>
+    </md-card-content>
+    <md-card-actions>
+        <button type="submit" md-raised-button [disabled]="!wineForm.form.valid">
+            Save
+        </button>
+        <button md-raised-button (click)="onCancel()" color=warn>
+            Cancel
+        </button>
+    </md-card-actions>
+</form>
+</md-card>

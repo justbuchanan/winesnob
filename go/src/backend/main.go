@@ -1,19 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
-	"os/exec"
-	"strconv"
-	// "time"
-	// "apiai"
 	"backend/apiai"
 	"strings"
 
@@ -32,29 +26,22 @@ type WineInfo struct {
 	Year        int64  `json:"year"`
 	Red         bool   `json:"red"`
 	Available bool `json:"available"`
-}
 
-type Part struct {
 	Id          string `json:"id"`
-	Brief       string `json:"brief"`
-	Description string `json:"description"`
-	Quantity    uint64 `json:"quantity"`
 }
 
-var allWines []WineInfo
 var db *gorm.DB
 
 func main() {
 	// TODO: seed rng
 
 	var err error
-	allWines, err = ReadWines("wine-list.json")
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
 
-	dbPath := flag.String("dbpath", "./parts.sqlite3db", "Path to sqlite3 database file")
+	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
 	flag.Parse()
 
 	// sqlite3 database
@@ -65,20 +52,19 @@ func main() {
 	db.LogMode(true)
 
 	// setup schema
-	db.AutoMigrate(&Part{})
+	db.AutoMigrate(&WineInfo{})
 
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
 
-	// parts "api" routes
-	// api := router.PathPrefix("/api").Subrouter()
-	// api.HandleFunc("/part/{partId}", PartHandler).Methods("GET")
-	// api.HandleFunc("/part/{partId}", PartDeleteHandler).Methods("DELETE")
-	// api.HandleFunc("/part/{partId}/label", PartLabelHandler).Methods("GET")
-	// api.HandleFunc("/parts", PartCreateHandler).Methods("POST")
-	// api.HandleFunc("/parts", PartsIndexHandler).Methods("GET")
-	// api.HandleFunc("/part/{partId}", PartUpdateHandler).Methods("PUT")
+	// "api" routes
+	api := router.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/wine/{wineId}", WineHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", WineDeleteHandler).Methods("DELETE")
+	api.HandleFunc("/wines", WineCreateHandler).Methods("POST")
+	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
 
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
@@ -116,7 +102,9 @@ func ReadWines(filename string) (wines []WineInfo, err error) {
 }
 
 func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
-	for _, wine := range allWines {
+	var wines []WineInfo
+	db.Find(&wines)	
+	for _, wine := range wines {
 		if wine.Variety == descriptor["variety"].(string) {
 			fmt.Println("found it!")
 			return &wine
@@ -145,7 +133,9 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if intent == "wine.list" {
 		color := req.Result.Parameters["wine-type"]
 		var wineNames []string
-		for _, elem := range allWines {
+		var wines []WineInfo
+		db.Find(&wines)
+		for _, elem := range wines {
 			if (color == "" || (color == "red" == elem.Red)) && elem.Available {
 				wineNames = append(wineNames, elem.Variety)
 			}
@@ -185,7 +175,7 @@ func GenerateUniqueId() string {
 	for {
 		id := GenerateRandomId()
 		var count uint64
-		err := db.Model(&Part{}).Where("id = ?", id).Count(&count).Error
+		err := db.Model(&WineInfo{}).Where("id = ?", id).Count(&count).Error
 		if err != nil {
 			log.Fatal(err)
 			return ""
@@ -196,11 +186,11 @@ func GenerateUniqueId() string {
 	}
 }
 
-func PartDeleteHandler(w http.ResponseWriter, r *http.Request) {
+func WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	partId := vars["partId"]
+	wineId := vars["wineId"]
 
-	err := db.Delete(&Part{Id: partId}).Error
+	err := db.Delete(&WineInfo{Id: wineId}).Error
 	if err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -210,10 +200,10 @@ func PartDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: set deleted status code
 }
 
-func PartCreateHandler(w http.ResponseWriter, r *http.Request) {
+func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var part Part
-	err := decoder.Decode(&part)
+	var wine WineInfo
+	err := decoder.Decode(&wine)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Invalid json")
@@ -221,10 +211,10 @@ func PartCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// assign a unique id
-	part.Id = GenerateUniqueId()
+	wine.Id = GenerateUniqueId()
 
-	// try to create a new part in the db
-	err = db.Create(&part).Error
+	// try to create a new wine in the db
+	err = db.Create(&wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
@@ -232,122 +222,53 @@ func PartCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(part)
+	json.NewEncoder(w).Encode(wine)
 }
 
-func PartUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	partId := vars["partId"]
+	wineId := vars["wineId"]
 
 	decoder := json.NewDecoder(r.Body)
-	var part Part
-	err := decoder.Decode(&part)
+	var wine WineInfo
+	err := decoder.Decode(&wine)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Invalid json")
 		return
 	}
 
-	part.Id = "" // clear part id so it doesn't get set by the update
-	err = db.Model(&part).Where("id = ?", partId).Updates(part).Error
+	wine.Id = "" // clear wine id so it doesn't get set by the update
+	err = db.Model(&wine).Where("id = ?", wineId).Updates(wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
 		return
 	}
 
-	json.NewEncoder(w).Encode(part)
+	json.NewEncoder(w).Encode(wine)
 }
 
-func PartHandler(w http.ResponseWriter, r *http.Request) {
+func WineHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	partId := vars["partId"]
+	wineId := vars["wineId"]
 
-	var part Part
-	err := db.Where(&Part{Id: partId}).First(&part).Error
+	var wine WineInfo
+	err := db.Where(&WineInfo{Id: wineId}).First(&wine).Error
 
-	// 404 if no part exists with that id
+	// 404 if no wine exists with that id
 	if err == gorm.ErrRecordNotFound {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "No part found for id %q\n", partId)
+		fmt.Fprintf(w, "No wine found for id %q\n", wineId)
 		return
 	}
 
-	json.NewEncoder(w).Encode(part)
+	json.NewEncoder(w).Encode(wine)
 }
 
-func PartsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	var parts []Part
-	db.Find(&parts)
+func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
+	var wines []WineInfo
+	db.Find(&wines)
 
-	json.NewEncoder(w).Encode(parts)
-}
-
-func PartLabelHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	partId := vars["partId"]
-
-	// lookup part
-	var part Part
-	err := db.Where(&Part{Id: partId}).First(&part).Error
-
-	// 404 if no part exists with that id
-	if err == gorm.ErrRecordNotFound {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "No part found for id %q\n", partId)
-		return
-	}
-
-	// create tmp dir to write label into
-	var tmpdir string
-	tmpdir, err = ioutil.TempDir("/tmp", "inventory")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	filename := part.Id + "-label.pdf"
-	outpath := tmpdir + "/" + part.Id
-
-	// generate label using python script
-	dir, _ := os.Getwd()
-	fmt.Println(dir)
-	cmd := exec.Command(dir+"/dymo-labelgen/main.py",
-		part.Brief,
-		"https://inventory.justbuchanan.com/part/"+part.Id,
-		"--bbox",
-		"--size=small",
-		"--output="+outpath)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err = cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf(string(out.Bytes()))
-
-	// read pdf file
-	pdfdata, err := os.Open(outpath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer pdfdata.Close()
-
-	// get file size
-	var fi os.FileInfo
-	fi, err = pdfdata.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-	pdfSize := fi.Size()
-
-	// set header info
-	w.Header().Set("Content-Type", "application/pdf")
-	w.Header().Set("Content-Disposition", "attachment; filename=\""+filename+"\"")
-	w.Header().Set("Content-Length", strconv.FormatInt(pdfSize, 10))
-
-	// write pdf to http response
-	_, err = io.Copy(w, pdfdata)
-	if err != nil {
-		log.Fatal(err)
-	}
+	json.NewEncoder(w).Encode(wines)
 }

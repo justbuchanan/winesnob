@@ -2,49 +2,49 @@ import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
-import { Part } from './part';
+import { Wine } from './wine';
 
 @Injectable()
-export class PartService {
+export class WineService {
     constructor(private http: Http) { }
 
-    getParts(): Promise<Part[]> {
-        return this.http.get('api/parts')
+    getWines(): Promise<Wine[]> {
+        return this.http.get('api/wines')
             .toPromise()
             .then(response => {
-                var parts: Part[] = response.json() as Part[];
-                return parts;
+                var wines: Wine[] = response.json() as Wine[];
+                return wines;
             })
-            .then(parts => {
-                return parts;
+            .then(wines => {
+                return wines;
             })
             .catch(this.handleError);
     }
 
-    createPart(part: Part): Promise<Part> {
-        return this.http.post('api/parts', JSON.stringify(part))
+    createWine(wine: Wine): Promise<Wine> {
+        return this.http.post('api/wines', JSON.stringify(wine))
         .toPromise()
         .then(response => {
-            var part: Part = response.json() as Part;
-            return part;
+            var wine: Wine = response.json() as Wine;
+            return wine;
         })
         .catch(this.handleError);
     }
 
-    getPart(id: string): Promise<Part> {
-        return this.http.get('api/part/' + id)
+    getWine(id: string): Promise<Wine> {
+        return this.http.get('api/wine/' + id)
         .toPromise()
         .then(response => {
-            var part: Part = response.json() as Part;
-            return part;
+            var wine: Wine = response.json() as Wine;
+            return wine;
         })
         .catch(this.handleError);
     }
 
     // TODO: check response code?
     // TODO: Promise return value?
-    deletePart(id: string): Promise<boolean> {
-        return this.http.delete('api/part/' + id)
+    deleteWine(id: string): Promise<boolean> {
+        return this.http.delete('api/wine/' + id)
         .toPromise()
         .then(response => {
             return true;

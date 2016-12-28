@@ -1,0 +1,9 @@
+<md-card>
+    <md-card-title>{{wine.variety}} : {{wine.name}}</md-card-title>
+    <md-card-content>{{wine.description}}</md-card-content>
+    <md-card-content>Red?: {{wine.red}}</md-card-content>
+    <md-card-content>Available?: {{wine.available}}</md-card-content>
+
+    <button md-raised-button color="warn" (click)="onEditWine()">Edit</button>
+    <button md-raised-button color="warn" (click)="delete.emit(wine.id)">Delete</button>
+</md-card>

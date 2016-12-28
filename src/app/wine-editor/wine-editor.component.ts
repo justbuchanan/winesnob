@@ -1,22 +1,22 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Part } from '../part';
-import { PartService } from '../part.service';
+import { Wine } from '../wine';
+import { WineService } from '../wine.service';
 
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'app-part-editor',
-  templateUrl: './part-editor.component.html',
-  styleUrls: ['./part-editor.component.css']
+  selector: 'app-wine-editor',
+  templateUrl: './wine-editor.component.html',
+  styleUrls: ['./wine-editor.component.css']
 })
-export class PartEditorComponent implements OnInit {
+export class WineEditorComponent implements OnInit {
 
   constructor(
       private route: ActivatedRoute,
       private router: Router,
-      private partService: PartService
+      private wineService: WineService
    ) { }
 
   ngOnInit() {
@@ -24,7 +24,7 @@ export class PartEditorComponent implements OnInit {
 
       const url: Observable<string> = this.route.url.map(segments => segments.join(''));
       url.subscribe(
-          value => this.isNewPart = value == 'create',
+          value => this.isNewWine = value == 'create',
           error => console.log(error),
           () => console.log('finished')
       )
@@ -32,27 +32,27 @@ export class PartEditorComponent implements OnInit {
       this.route.params
           .switchMap((params: Params) => {
               if (params['id'] != null) {
-                  return this.partService.getPart(params['id'])
+                  return this.wineService.getWine(params['id'])
               } else {
-                  return new Promise<Part>(function (resolve, reject) {
-                      resolve(new Part);
+                  return new Promise<Wine>(function (resolve, reject) {
+                      resolve(new Wine);
                   })
               }
           })
-          .subscribe((part: Part) => this.part = part);
+          .subscribe((wine: Wine) => this.wine = wine);
   }
 
   // TODO: error handling
   onSubmit() {
-      if (this.isNewPart) {
+      if (this.isNewWine) {
           console.log('submit')
-          this.partService.createPart(this.part).then(part => {
-              console.log("created part!" + JSON.stringify(part))
+          this.wineService.createWine(this.wine).then(wine => {
+              console.log("created wine!" + JSON.stringify(wine))
               // back to home screen
               this.router.navigate(['/'])
           });
       } else {
-          // TODO: update part
+          // TODO: update wine
       }
   }
 
@@ -61,7 +61,7 @@ export class PartEditorComponent implements OnInit {
   }
 
   @Input()
-  part: Part;
+  wine: Wine;
 
-  isNewPart: boolean;
+  isNewWine: boolean;
 }

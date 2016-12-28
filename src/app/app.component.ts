@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Part } from './part';
+import { Wine } from './wine';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,10 +14,10 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  addPartClicked(event) {
+  addWineClicked(event) {
     this.router.navigate(['/create'])
   }
 
-  title = 'Shop Inventory';
-  parts: Part[];
+  title = 'Cellar';
+  wines: Wine[];
 }

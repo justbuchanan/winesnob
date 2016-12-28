@@ -8,26 +8,27 @@ import { MdToolbarModule } from '@angular2-material/toolbar';
 import { MdButtonModule } from '@angular2-material/button';
 import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
 import { MdInputModule } from '@angular2-material/input';
+import { MdCheckboxModule } from '@angular2-material/checkbox';
 import { NgPipesModule } from 'ng-pipes';
 
 import { AppComponent } from './app.component';
-import { PartComponent } from './part/part.component';
-import { PartEditorComponent } from './part-editor/part-editor.component';
-import { PartListComponent } from './part-list/part-list.component';
-import { PartService } from './part.service';
+import { WineComponent } from './wine/wine.component';
+import { WineEditorComponent } from './wine-editor/wine-editor.component';
+import { WineListComponent } from './wine-list/wine-list.component';
+import { WineService } from './wine.service';
 
 const appRoutes: Routes = [
-  { path: 'create', component: PartEditorComponent },
-  { path: 'edit/:id', component: PartEditorComponent },
-  { path: '', component: PartListComponent }
+  { path: 'create', component: WineEditorComponent },
+  { path: 'edit/:id', component: WineEditorComponent },
+  { path: '', component: WineListComponent }
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    PartComponent,
-    PartEditorComponent,
-    PartListComponent
+    WineComponent,
+    WineEditorComponent,
+    WineListComponent
   ],
   imports: [
     BrowserModule,
@@ -38,12 +39,13 @@ const appRoutes: Routes = [
     MdButtonModule,
     MdIconModule,
     MdInputModule,
+    MdCheckboxModule,
     RouterModule.forRoot(appRoutes),
     NgPipesModule,
   ],
   providers: [
     MdIconRegistry,
-    PartService
+    WineService
   ],
   bootstrap: [AppComponent]
 })

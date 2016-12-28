@@ -1,0 +1,8 @@
+<div>
+    <md-input [(ngModel)]="query" placeholder='Search'></md-input>
+    <ul class="wines">
+        <div *ngFor="let wine of wines | fuzzy:query">
+            <app-wine [wine]="wine" (delete)="this.deleteWine($event)"></app-wine>
+        </div>
+    </ul>
+</div>
