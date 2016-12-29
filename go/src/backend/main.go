@@ -17,6 +17,9 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 type WineInfo struct {
@@ -83,9 +86,14 @@ func main() {
 	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
 
+	router.HandleFunc("/login", LoginPageHandler)
+
+    router.HandleFunc("/GoogleLogin", handleGoogleLogin)
+    router.HandleFunc("/GoogleCallback", handleGoogleCallback)
+
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
-
+    
 	fmt.Println("Winesnob listening on port 8080")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
@@ -293,4 +301,57 @@ func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
 	db.Find(&wines)
 
 	json.NewEncoder(w).Encode(wines)
+}
+
+const loginHtml = `<html><body>
+<a href="/GoogleLogin">Log in with Google</a>
+</body></html>
+`
+
+var (
+    googleOauthConfig = &oauth2.Config{
+        RedirectURL:    "http://localhost:8080/GoogleCallback",
+        // ClientID:     os.Getenv("googlekey"),
+        ClientID: "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
+        ClientSecret: "1WiXvWqZCmGw4H3ISsimgpFi",
+        // ClientSecret: os.Getenv("googlesecret"),
+        Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email"},
+        Endpoint:     google.Endpoint,
+    }
+// Some random string, random for each request
+    oauthStateString = "random"
+)
+
+func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, loginHtml)
+}
+
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+    url := googleOauthConfig.AuthCodeURL(oauthStateString)
+    http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handleGoogleCallback")
+    state := r.FormValue("state")
+    if state != oauthStateString {
+        fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+        http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+        return
+    }
+
+    code := r.FormValue("code")
+    token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
+    if err != nil {
+        fmt.Println("Code exchange failed with '%s'\n", err)
+        http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+        return
+    }
+
+    response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+
+    defer response.Body.Close()
+    contents, err := ioutil.ReadAll(response.Body)
+    fmt.Fprintf(w, "Content: %s\n", contents)
 }
