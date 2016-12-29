@@ -86,10 +86,8 @@ func main() {
 	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
 
-	router.HandleFunc("/login", LoginPageHandler)
-
-    router.HandleFunc("/GoogleLogin", handleGoogleLogin)
-    router.HandleFunc("/GoogleCallback", handleGoogleCallback)
+    router.HandleFunc("/oauth2/login", handleGoogleLogin)
+    router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
 
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
@@ -303,17 +301,12 @@ func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wines)
 }
 
-const loginHtml = `<html><body>
-<a href="/GoogleLogin">Log in with Google</a>
-</body></html>
-`
-
 var (
     googleOauthConfig = &oauth2.Config{
-        RedirectURL:    "http://localhost:8080/GoogleCallback",
+        RedirectURL:    "http://localhost:4200/oauth2/google-callback",
         // ClientID:     os.Getenv("googlekey"),
         ClientID: "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
-        ClientSecret: "1WiXvWqZCmGw4H3ISsimgpFi",
+        ClientSecret: "lG7MbRpyc5joTUXPLyI9Ymft",
         // ClientSecret: os.Getenv("googlesecret"),
         Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/userinfo.email"},
@@ -323,9 +316,7 @@ var (
     oauthStateString = "random"
 )
 
-func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, loginHtml)
-}
+const ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
 
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
     url := googleOauthConfig.AuthCodeURL(oauthStateString)
@@ -353,5 +344,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
     defer response.Body.Close()
     contents, err := ioutil.ReadAll(response.Body)
-    fmt.Fprintf(w, "Content: %s\n", contents)
+    fmt.Printf("Content: %s\n", contents)
+
+    http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
