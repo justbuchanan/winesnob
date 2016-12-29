@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -34,6 +35,7 @@ type WineInfo struct {
 }
 
 var db *gorm.DB
+var store = sessions.NewCookieStore([]byte("something-very-secret")) // TODO: secret
 
 func main() {
 	// TODO: seed rng
@@ -294,7 +296,25 @@ func WineHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wine)
 }
 
+func IsLoggedIn(r *http.Request) bool {
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		// TODO: handle error
+		log.Fatal(err)
+		return false
+	}
+
+	email := session.Values["email"]
+	return email != nil
+}
+
 func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsLoggedIn(r) {
+		http.Error(w, "need to authenticate", http.StatusForbidden)
+	}
+
+	// TODO: separate wine lists
+
 	var wines []WineInfo
 	db.Find(&wines)
 
@@ -304,10 +324,8 @@ func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
 var (
     googleOauthConfig = &oauth2.Config{
         RedirectURL:    "http://localhost:4200/oauth2/google-callback",
-        // ClientID:     os.Getenv("googlekey"),
         ClientID: "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
         ClientSecret: "lG7MbRpyc5joTUXPLyI9Ymft",
-        // ClientSecret: os.Getenv("googlesecret"),
         Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/userinfo.email"},
         Endpoint:     google.Endpoint,
@@ -373,6 +391,15 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
 	if stringInSlice(result.Email, ALLOWED_USERS) {
+		session, err := store.Get(r, "session-name")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		session.Values["email"] = result.Email
+		session.Save(r, w)
+
 		fmt.Println("Allowed user!")
 	    http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	} else {
