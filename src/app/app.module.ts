@@ -3,13 +3,15 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { MdCardModule } from '@angular2-material/card';
-import { MdToolbarModule } from '@angular2-material/toolbar';
-import { MdButtonModule } from '@angular2-material/button';
-import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
-import { MdInputModule } from '@angular2-material/input';
-import { MdCheckboxModule } from '@angular2-material/checkbox';
+import { MdCardModule } from '@angular/material/card';
+import { MdToolbarModule } from '@angular/material/toolbar';
+import { MdButtonModule } from '@angular/material/button';
+import { MdIconModule, MdIconRegistry } from '@angular/material/icon';
+import { MdInputModule } from '@angular/material/input';
+import { MdCheckboxModule } from '@angular/material/checkbox';
 import { NgPipesModule } from 'ng-pipes';
+import { MaterialModule } from '@angular/material';
+import { MdDialogModule } from '@angular/material/dialog';
 
 import { AppComponent } from './app.component';
 import { WineComponent } from './wine/wine.component';
@@ -28,13 +30,14 @@ const appRoutes: Routes = [
     AppComponent,
     WineComponent,
     WineEditorComponent,
-    WineListComponent
+    WineListComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
     MdCardModule,
+    MdDialogModule,
     MdToolbarModule,
     MdButtonModule,
     MdIconModule,
@@ -42,6 +45,8 @@ const appRoutes: Routes = [
     MdCheckboxModule,
     RouterModule.forRoot(appRoutes),
     NgPipesModule,
+    MaterialModule,
+    MaterialModule.forRoot(),
   ],
   providers: [
     MdIconRegistry,
