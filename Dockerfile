@@ -13,7 +13,9 @@ ENV GOPATH=/winesnob/go
 RUN go get -u github.com/gorilla/mux \
     github.com/gorilla/handlers \
     github.com/jinzhu/gorm \
-    github.com/jinzhu/gorm/dialects/sqlite
+    github.com/jinzhu/gorm/dialects/sqlite \
+    golang.org/x/oauth2 \
+    golang.org/x/oauth2/google
 
 COPY package.json ./
 RUN npm install
