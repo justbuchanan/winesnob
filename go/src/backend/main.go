@@ -316,12 +316,36 @@ var (
     oauthStateString = "random"
 )
 
-const ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
+var ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
 
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
     url := googleOauthConfig.AuthCodeURL(oauthStateString)
     http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
+
+type GoogleOauth2Result struct {
+	ID string `json:"id"`
+	Email string `json:"email"`
+	VerifiedEmail bool `json:"verified_email"`
+	Name string `json:"name"`
+	GivenName string `json:"given_name"`
+	FamilyName string `json:"family_name"`
+	Link string `json:"link"`
+	Picture string `json:"picture"`
+	Gender string `json:"gender"`
+	Locale string `json:"locale"`
+}
+
+// http://stackoverflow.com/questions/15323767/does-golang-have-if-x-in-construct-similar-to-python
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
 
 func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handleGoogleCallback")
@@ -344,7 +368,14 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
     defer response.Body.Close()
     contents, err := ioutil.ReadAll(response.Body)
-    fmt.Printf("Content: %s\n", contents)
 
-    http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+    var result GoogleOauth2Result
+	err = json.Unmarshal(contents, &result)
+	fmt.Println("Got user: " + result.Email)
+	if stringInSlice(result.Email, ALLOWED_USERS) {
+		fmt.Println("Allowed user!")
+	    http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+	}
 }
