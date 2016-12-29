@@ -22,7 +22,7 @@ import { WineService } from './wine.service';
 const appRoutes: Routes = [
   { path: 'create', component: WineEditorComponent },
   { path: 'edit/:id', component: WineEditorComponent },
-  { path: '', component: WineListComponent }
+  // { path: '', component: WineListComponent }
 ];
 
 @NgModule({

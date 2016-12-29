@@ -19,5 +19,6 @@ export class AppComponent implements OnInit {
   }
 
   title = 'Cellar';
+  query: string;
   wines: Wine[];
 }

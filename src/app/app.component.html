@@ -1,9 +1,12 @@
 <md-toolbar [color]="primary">
     <span>{{title}}</span>
     <span style="flex: 1 1 auto;"></span>
+    <md-input [(ngModel)]="query" placeholder='Search'></md-input>
+    <span style="flex: 1 1 auto;"></span>
 </md-toolbar>
 
 <div class="content-container">
+    <app-wine-list [query]="query"></app-wine-list>
     <router-outlet></router-outlet>
 </div>
 

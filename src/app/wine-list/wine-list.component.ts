@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Input, Component, OnInit, EventEmitter } from '@angular/core';
 import { Wine } from '../wine';
 import { WineService } from '../wine.service';
 import { Router } from '@angular/router';
@@ -39,6 +39,7 @@ export class WineListComponent implements OnInit {
     })
   }
 
+  @Input()
   query: string;
 
   wines: Wine[] = [];
