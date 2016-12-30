@@ -1,7 +1,5 @@
 * fix fuzzy search - it sucks
-* redirect to login if user isn't authenticated
-* add a 'blocked' page if the user isn't allowed to use the app
-  * have a login link on this page
+* fuzzy search for 'describe'
 * refactor item delete
   * show deletion immediately, dont require a page refresh
   * animation?
@@ -9,6 +7,9 @@
   * dialog
 * Inline edit?
 * improve layout of item card
+* fix vertical sizing of components
+  * right now a fixed header/footer size is assumed, but the bars shrink when the page is smaller
 * keyboard shortcuts
-* fuzzy search for 'describe'
 
+* longer preview:
+    * http://stackoverflow.com/questions/41088596/make-google-actions-development-project-preview-persist-longer

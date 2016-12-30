@@ -25,3 +25,7 @@ md-toolbar.footer p {
     display: block;
     width: 56px; /* width of fab button */
 }
+
+md-toolbar.header p {
+    font-size: 10pt;
+}

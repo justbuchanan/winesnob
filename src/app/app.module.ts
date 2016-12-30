@@ -20,6 +20,7 @@ import { WineListComponent } from './wine-list/wine-list.component';
 import { WineService } from './wine.service';
 
 import { ExtendedHttpService } from './extended-http.service';
+import { MyAuthenticationService } from './authentication.service';
 
 import { LoginComponent } from './login.component';
 
@@ -62,6 +63,7 @@ export function httpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptio
   providers: [
     MdIconRegistry,
     WineService,
+    MyAuthenticationService,
     {
       provide: ExtendedHttpService,
       useFactory: httpFactory,

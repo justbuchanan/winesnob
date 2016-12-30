@@ -342,6 +342,7 @@ func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsLoggedIn(r) {
 		http.Error(w, "need to authenticate", http.StatusForbidden)
+		return
 	}
 
 	// TODO: separate wine lists
