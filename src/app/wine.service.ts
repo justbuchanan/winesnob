@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Headers, Http } from '@angular/http';
+import { Headers } from '@angular/http';
+import { ExtendedHttpService } from './extended-http.service';
 import 'rxjs/add/operator/toPromise';
 
 import { Wine } from './wine';
 
 @Injectable()
 export class WineService {
-    constructor(private http: Http) { }
+    constructor(private http: ExtendedHttpService) { }
 
     getWines(): Promise<Wine[]> {
         return this.http.get('api/wines')
