@@ -6,4 +6,4 @@ wine:
         - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
         - LETSENCRYPT_HOST=winesnob.justbuchanan.com
     volumes:
-      - /home/justin/winery-data:/data
+      - /home/justin/cellar-data:/data
