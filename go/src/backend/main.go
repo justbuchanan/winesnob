@@ -25,6 +25,8 @@ import (
 	"github.com/renstrom/fuzzysearch/fuzzy"
 )
 
+const SESSION_NAME = "cellar"
+
 type WineInfo struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -52,6 +54,7 @@ func CreateHttpHandler() http.Handler {
 	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
 
     router.HandleFunc("/oauth2/login", handleGoogleLogin)
+    router.HandleFunc("/oauth2/logout", handleGoogleLogout)
     router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
 
 	// serve angular frontend
@@ -307,7 +310,7 @@ func WineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsLoggedIn(r *http.Request) bool {
-	session, err := store.Get(r, "session-name")
+	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
 		// TODO: handle error
 		log.Fatal(err)
@@ -345,6 +348,20 @@ var (
 )
 
 var ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
+
+func handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, SESSION_NAME)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// clear session login data
+	session.Values["email"] = nil
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
 
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
     url := googleOauthConfig.AuthCodeURL(oauthStateString)
@@ -401,7 +418,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
 	if stringInSlice(result.Email, ALLOWED_USERS) {
-		session, err := store.Get(r, "session-name")
+		session, err := store.Get(r, SESSION_NAME)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
