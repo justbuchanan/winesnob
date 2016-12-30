@@ -63,16 +63,6 @@ export class WineEditorComponent implements OnInit {
   @Input()
   wine: Wine;
 
-  wine_varieties: Array<any> =
-   [
-     { name: 'Super Tuscan', value: '1' },
-     { name: 'Chardonnay', value: '2' },
-     { name: 'Pinot Noir', value: '3' },
-     { name: 'Gothenburg', value: '4' },
-     { name: 'London', value: '5' },
-     { name: 'Seville', value: '6' }
-   ];
-
    item: any;
 
     private change(value: any) {

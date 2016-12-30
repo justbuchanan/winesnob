@@ -27,7 +27,6 @@ import (
 
 type WineInfo struct {
 	Name        string `json:"name"`
-	Variety     string `json:"variety"`
 	Description string `json:"description"`
 	Year        int64  `json:"year"`
 	Red         bool   `json:"red"`
@@ -168,7 +167,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		db.Find(&wines)
 		for _, elem := range wines {
 			if (color == "" || (color == "red" == elem.Red)) && elem.Available {
-				wineNames = append(wineNames, elem.Variety)
+				wineNames = append(wineNames, elem.Name)
 			}
 		}
 
@@ -182,7 +181,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 		wine := WineDescriptorLookup(wineDesc)
 		if wine != nil {
-			resp.Speech = wine.Description
+			resp.Speech = wine.Name + ": " + wine.Description
 		} else {
 			resp.Speech = "I'm sorry, I couldn't find a wine matching that description"
 		}
