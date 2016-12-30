@@ -1,7 +1,6 @@
 md-toolbar {
     background: #722f37;
     color: white;
-    height: 10%;
 }
 
 a[md-button] {
@@ -10,6 +9,7 @@ a[md-button] {
 }
 
 .content-container {
-    overflow: scroll;
-    height: 80%;
+    overflow-y: auto;
+    height: calc(100% - 128px);
+    width: 100%;
 }

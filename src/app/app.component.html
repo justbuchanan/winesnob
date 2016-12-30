@@ -1,6 +1,7 @@
-<md-toolbar [color]="primary">
+<md-toolbar [color]="primary" class="header">
     <span>{{title}}</span>
     <span style="flex: 1 1 auto;"></span>
+    <md-icon>search</md-icon>
     <md-input [(ngModel)]="query" placeholder='Search'></md-input>
     <span style="flex: 1 1 auto;"></span>
 </md-toolbar>
@@ -10,7 +11,7 @@
     <router-outlet></router-outlet>
 </div>
 
-<md-toolbar [color]="warm">
+<md-toolbar [color]="warm" class="footer">
     <span style="flex: 1 1 auto;"></span>
     <a md-button md-fab routerLink="/create"><md-icon>add</md-icon></a>
 </md-toolbar>
