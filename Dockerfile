@@ -12,6 +12,7 @@ RUN mkdir -p go/src
 ENV GOPATH=/winesnob/go
 RUN go get -u github.com/gorilla/mux \
     github.com/gorilla/handlers \
+    github.com/gorilla/sessions \
     github.com/jinzhu/gorm \
     github.com/jinzhu/gorm/dialects/sqlite \
     golang.org/x/oauth2 \
