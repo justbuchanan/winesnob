@@ -15,7 +15,8 @@ RUN go get -u github.com/gorilla/mux \
     github.com/jinzhu/gorm \
     github.com/jinzhu/gorm/dialects/sqlite \
     golang.org/x/oauth2 \
-    golang.org/x/oauth2/google
+    golang.org/x/oauth2/google \
+    github.com/renstrom/fuzzysearch/fuzzy
 
 COPY package.json ./
 RUN npm install

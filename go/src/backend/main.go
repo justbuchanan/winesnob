@@ -21,6 +21,8 @@ import (
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+
+	"github.com/renstrom/fuzzysearch/fuzzy"
 )
 
 type WineInfo struct {
@@ -126,18 +128,22 @@ func ReadWines(filename string) (wines []WineInfo, err error) {
 	return wines, nil
 }
 
-func WineDescriptorLookup(descriptor map[string]interface{}) *WineInfo {
+func WineDescriptorLookup(descriptor string) *WineInfo {
 	var wines []WineInfo
 	db.Find(&wines)
+
+	var bestMatch *WineInfo
+	bestMatchR := 0
+
 	for _, wine := range wines {
-		if wine.Variety == descriptor["variety"].(string) {
-			fmt.Println("found it!")
-			return &wine
+		r := fuzzy.RankMatch(descriptor, wine.Name)
+		if r > bestMatchR {
+			bestMatch = &wine
+			bestMatchR = r
 		}
-		fmt.Println("variety = ", wine.Variety)
 	}
 
-	return nil
+	return bestMatch
 }
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -173,8 +179,8 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if intent == "wine.describe" {
-		wineP := req.Result.Parameters["wine-descriptor"].(map[string]interface{})
-		wine := WineDescriptorLookup(wineP)
+		wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+		wine := WineDescriptorLookup(wineDesc)
 		if wine != nil {
 			resp.Speech = wine.Description
 		} else {
