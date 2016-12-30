@@ -1,13 +1,14 @@
-* Search bar to filter items
-* show and modify item "type"
+* fix fuzzy search - it sucks
+* redirect to login if user isn't authenticated
+* add a 'blocked' page if the user isn't allowed to use the app
+  * have a login link on this page
 * refactor item delete
   * show deletion immediately, dont require a page refresh
   * animation?
   * handle logic in part list, not part?
-* Edit existing item
-* Modify quantity
-* View graph of quantity over time?
-* grid layout?
-* store container locations?
+  * dialog
+* Inline edit?
 * improve layout of item card
 * keyboard shortcuts
+* fuzzy search for 'describe'
+
