@@ -2,8 +2,8 @@
 wine:
     build: /home/justin/cellar/
     environment:
-        - VIRTUAL_HOST=winesnob.justbuchanan.com
+        - VIRTUAL_HOST=cellar.justbuchanan.com
         - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
-        - LETSENCRYPT_HOST=winesnob.justbuchanan.com
+        - LETSENCRYPT_HOST=cellar.justbuchanan.com
     volumes:
       - /home/justin/cellar-data:/data
