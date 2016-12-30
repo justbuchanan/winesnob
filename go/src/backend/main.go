@@ -56,6 +56,7 @@ func CreateHttpHandler() http.Handler {
     router.HandleFunc("/oauth2/login", handleGoogleLogin)
     router.HandleFunc("/oauth2/logout", handleGoogleLogout)
     router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
+    router.HandleFunc("/oauth2/login-status", LoginStatusHandler)
 
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
@@ -319,6 +320,23 @@ func IsLoggedIn(r *http.Request) bool {
 
 	email := session.Values["email"]
 	return email != nil
+}
+
+func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
+	sess, err := store.Get(r, SESSION_NAME)
+	if err != nil {
+		log.Fatal(err)
+		// TODO: set error http
+		return
+	}
+
+	email := sess.Values["email"]
+
+	js := map[string]interface{} {
+		"email": email,
+	}
+
+	json.NewEncoder(w).Encode(js)
 }
 
 func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
