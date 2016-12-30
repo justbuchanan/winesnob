@@ -33,4 +33,4 @@ RUN ng build --env=prod
 
 VOLUME "/data"
 EXPOSE 8080
-CMD ["go", "run", "go/src/backend/main.go", "--dbpath", "/data/parts.sqlite3db"]
+CMD ["go", "run", "go/src/backend/main.go", "--dbpath", "/data/cellar.sqlite3db"]
