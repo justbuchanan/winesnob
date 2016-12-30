@@ -38,6 +38,30 @@ type WineInfo struct {
 var db *gorm.DB
 var store = sessions.NewCookieStore([]byte("something-very-secret")) // TODO: secret
 
+func CreateHttpHandler() http.Handler {
+	router := mux.NewRouter().StrictSlash(true)
+
+	router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
+
+	// "api" routes
+	api := router.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/wine/{wineId}", WineHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", WineDeleteHandler).Methods("DELETE")
+	api.HandleFunc("/wines", WineCreateHandler).Methods("POST")
+	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
+
+    router.HandleFunc("/oauth2/login", handleGoogleLogin)
+    router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
+
+	// serve angular frontend
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
+    
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+
+	return loggedRouter
+}
+
 func main() {
 	// TODO: seed rng
 
@@ -76,27 +100,8 @@ func main() {
 		fmt.Println("Loaded sample wines")
 	}
 
-
-	router := mux.NewRouter().StrictSlash(true)
-
-	router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
-
-	// "api" routes
-	api := router.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/wine/{wineId}", WineHandler).Methods("GET")
-	api.HandleFunc("/wine/{wineId}", WineDeleteHandler).Methods("DELETE")
-	api.HandleFunc("/wines", WineCreateHandler).Methods("POST")
-	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
-	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
-
-    router.HandleFunc("/oauth2/login", handleGoogleLogin)
-    router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
-
-	// serve angular frontend
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
-    
+	loggedRouter := CreateHttpHandler()
 	fmt.Println("Winesnob listening on port 8080")
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
 }
 
