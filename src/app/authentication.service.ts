@@ -9,7 +9,7 @@ import 'rxjs/add/operator/mergeMap';
 @Injectable()
 export class MyAuthenticationService {
     constructor(private http: Http, private router: Router) { }
- 
+
     // login() {
     //     return this.http.get('/oauth2/login')
     //         // .map((response: Response) => {

@@ -1,8 +1,7 @@
 <div>
     <ul class="wines">
-        <div *ngFor="let wine of wines | fuzzy:query">
+        <div *ngFor="let wine of wines | fuzzyBy:'name':query">
             <app-wine [wine]="wine" (delete)="this.deleteWine($event)"></app-wine>
         </div>
     </ul>
 </div>
-

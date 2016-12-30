@@ -2,20 +2,20 @@ import { Input, Component, OnInit, EventEmitter } from '@angular/core';
 import { Wine } from '../wine';
 import { WineService } from '../wine.service';
 import { Router } from '@angular/router';
-import { FuzzyPipe } from 'ng-pipes';
+import { FuzzyByPipe } from 'ng-pipes';
+
 
 @Component({
   selector: 'app-wine-list',
   templateUrl: './wine-list.component.html',
   styleUrls: ['./wine-list.component.css'],
-  providers: [FuzzyPipe],
+  providers: [FuzzyByPipe],
 })
 export class WineListComponent implements OnInit {
 
   constructor(
       private router: Router,
       private wineService: WineService,
-      private fuzzy: FuzzyPipe, // fuzzy search filter tied to search field
       ) { }
 
   ngOnInit() {

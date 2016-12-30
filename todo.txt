@@ -1,4 +1,3 @@
-* fix fuzzy search - it sucks
 * fuzzy search for 'describe'
 * refactor item delete
   * show deletion immediately, dont require a page refresh
