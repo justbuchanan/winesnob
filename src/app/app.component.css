@@ -13,3 +13,15 @@ a[md-button] {
     height: calc(100% - 128px);
     width: 100%;
 }
+
+md-toolbar.footer p {
+    font-size: 12pt;
+    text-align: center;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+#left-spacer {
+    display: block;
+    width: 56px; /* width of fab button */
+}
