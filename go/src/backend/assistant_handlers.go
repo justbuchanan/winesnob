@@ -44,6 +44,13 @@ func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
     return &resp
 }
 
+func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
+    food := req.Result.Parameters["food"].(string)
+    return &apiai.ActionResponse{
+        Speech: "I'd recommend the amarone, it goes very well with " + food,
+    }
+}
+
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
     decoder := json.NewDecoder(r.Body)
     var req apiai.ActionRequest
@@ -54,17 +61,14 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    var resp *apiai.ActionResponse
+    intentHandlers := map[string](func(apiai.ActionRequest) *apiai.ActionResponse) {
+        "wine.list": Intent_Wine_List,
+        "wine.describe": Intent_Wine_Describe,
+        "wine.pair": Intent_Wine_Pair,
+    }
 
     intent := req.Result.Metadata.IntentName
-    if intent == "wine.list" {
-        resp = Intent_Wine_List(req)
-    } else if intent == "wine.describe" {
-        resp = Intent_Wine_Describe(req)
-    } else if intent == "wine.pair" {
-        food := req.Result.Parameters["food"].(string)
-        resp.Speech = "I'd recommend the amarone, it goes very well with " + food
-    }
+    resp := intentHandlers[intent](req)
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(resp)
