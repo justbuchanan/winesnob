@@ -68,6 +68,9 @@ func main() {
 
 	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
 	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
+
+	port := flag.String("port", "8080", "listen on port")
+
 	flag.Parse()
 
 	// sqlite3 database
@@ -82,7 +85,7 @@ func main() {
 
 
 	if *loadSamples == true {
-		wines, err := ReadWines("wine-list.json")
+		wines, err := ReadWinesFromFile("wine-list.json")
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
@@ -102,8 +105,8 @@ func main() {
 	}
 
 	loggedRouter := CreateHttpHandler()
-	fmt.Println("Winesnob listening on port 8080")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", loggedRouter))
+	fmt.Println("Winesnob listening on port " + *port)
+	log.Fatal(http.ListenAndServe("0.0.0.0:" + *port, loggedRouter))
 }
 
 // Similar to string Join(), but adds an "and" appropriately
@@ -117,7 +120,7 @@ func JoinWordSeries(items []string) string {
 	}
 }
 
-func ReadWines(filename string) (wines []WineInfo, err error) {
+func ReadWinesFromFile(filename string) (wines []WineInfo, err error) {
 	// wines := make([]WineInfo, 4)
 	var file []byte
 	file, err = ioutil.ReadFile(filename)
@@ -133,6 +136,8 @@ func ReadWines(filename string) (wines []WineInfo, err error) {
 	return wines, nil
 }
 
+// does a fuzzy match against the all wine names and returns the top one if any
+// match decently.
 func WineDescriptorLookup(descriptor string) *WineInfo {
 	var wines []WineInfo
 	db.Find(&wines)
