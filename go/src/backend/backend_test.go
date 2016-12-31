@@ -2,6 +2,7 @@ package main
 
 import (
     "testing"
+    "os"
     "net/http/httptest"
     "net/http"
     "log"
@@ -13,6 +14,7 @@ import (
     "encoding/json"
     "backend/apiai"
     "io/ioutil"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestJoinWordSeries(t *testing.T) {
@@ -27,7 +29,7 @@ func TestJoinWordSeries(t *testing.T) {
 func TestApi(t *testing.T) {
     db, _ = gorm.Open("sqlite3", ":memory:")
     defer db.Close()
-    db.LogMode(true)
+    db.LogMode(false)
 
     // setup schema
     db.AutoMigrate(&WineInfo{})
@@ -59,7 +61,7 @@ func TestApi(t *testing.T) {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Println(store)
+    // fmt.Println(store)
     if res.StatusCode == http.StatusForbidden {
         // t.Fatal("Api should be accessible after user is authenticated")
         // TODO
@@ -67,6 +69,8 @@ func TestApi(t *testing.T) {
 
     actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
     fmt.Println(actionResponse)
+
+    RunTestWineDescriptorLookup(t)
 }
 
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
@@ -102,5 +106,44 @@ func ForceAuthenticate(req *http.Request, email string) {
     w := httptest.NewRecorder()
     session.Save(req, w)
 
-    fmt.Println(session)
+    // fmt.Println(session)
+}
+
+func RunTestWineDescriptorLookup(t *testing.T) {
+    wines, err := ReadWinesFromFile("test-wines.json")
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    // insert into database
+    for _, wine := range wines {
+        wine.Id = GenerateUniqueId()
+        err = db.Create(&wine).Error
+        if err != nil {
+            log.Fatal(err)
+            os.Exit(1)
+        }
+    }
+    fmt.Println("Loaded test wines into db")
+
+    // exact match
+    result := WineDescriptorLookup("chiraz")
+    if assert.NotNil(t, result) {
+        assert.Equal(t, "chiraz", result.Name)
+    }
+
+    // approximate match
+    result = WineDescriptorLookup("chardonay") // missing an "n"
+    if assert.NotNil(t, result) {
+        assert.Equal(t, "chardonnay", result.Name)
+    }
+
+    result = WineDescriptorLookup("2013 amarone")
+    if assert.NotNil(t, result) {
+        assert.Equal(t, "2013 amarone", result.Name)
+    }
+
+    // bad match
+    result = WineDescriptorLookup("bla bla bla")
+    assert.Nil(t, result)
 }

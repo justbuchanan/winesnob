@@ -1,0 +1,37 @@
+[
+    {
+        "name": "2011 amarone",
+        "available": true,
+        "red": true
+    },
+
+    {
+        "name": "2013 amarone",
+        "available": true,
+        "red": true
+    },
+
+    {
+        "name": "amarone",
+        "available": true,
+        "red": true
+    },
+
+    {
+        "name": "chardonnay",
+        "available": true,
+        "red": false
+    },
+
+    {
+        "name": "cabernet sauvignon",
+        "available": true,
+        "red": true
+    },
+
+    {
+        "name": "chiraz",
+        "available": false,
+        "red": true
+    }
+]

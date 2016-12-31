@@ -142,18 +142,32 @@ func WineDescriptorLookup(descriptor string) *WineInfo {
 	var wines []WineInfo
 	db.Find(&wines)
 
-	var bestMatch *WineInfo
-	bestMatchR := 0
+	const debug = false
+
+	const WORST_ACCEPTABLE = 6
+	var bestMatch WineInfo
+	bestMatchR := WORST_ACCEPTABLE
+
+	if debug {fmt.Println("Looking for", descriptor)}
 
 	for _, wine := range wines {
 		r := fuzzy.RankMatch(descriptor, wine.Name)
-		if r > bestMatchR {
-			bestMatch = &wine
+		if (debug) {
+			fmt.Printf("  %d ", r)
+			fmt.Println(wine.Name)
+		}
+		if r != -1 && r < bestMatchR {
+			bestMatch = wine
 			bestMatchR = r
 		}
 	}
 
-	return bestMatch
+	if bestMatchR < WORST_ACCEPTABLE {
+		if (debug) { fmt.Println("Found:", bestMatch.Name)}
+		return &bestMatch
+	} else {
+		return nil
+	}
 }
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
