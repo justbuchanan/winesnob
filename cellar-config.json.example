@@ -1,0 +1,6 @@
+{
+    "GoogleClientID": "get from google dev console",
+    "GoogleClientSecret": "get from google dev console",
+    "BaseURL": "https://cellar.justbuchanan.com",
+    "CookieSecret": "generate this string randomly"
+}

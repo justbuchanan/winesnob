@@ -36,3 +36,5 @@ Thumbs.db
 
 *.sublime-workspace
 *.sqlite3db
+
+cellar-config.json

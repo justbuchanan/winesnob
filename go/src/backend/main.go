@@ -33,8 +33,15 @@ type WineInfo struct {
 	Id string `json:"id"`
 }
 
+type ServerConfigInfo struct {
+	GoogleClientID string
+	GoogleClientSecret string
+	BaseURL string // example: https://cellar.justbuchanan.com:3000
+	CookieSecret string
+}
+
 var db *gorm.DB
-var store = sessions.NewCookieStore([]byte("something-very-secret")) // TODO: secret
+var store *sessions.CookieStore
 
 func CreateHttpHandler() http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
@@ -62,15 +69,48 @@ func CreateHttpHandler() http.Handler {
 	return loggedRouter
 }
 
+func ReadConfigFile(filename string) (cfgRet *ServerConfigInfo, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	var cfg ServerConfigInfo
+
+	err = json.Unmarshal(file, &cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
+}
+
 func main() {
 	// TODO: seed rng
 
 	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
 	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
+	cfgPath := flag.String("config", "./cellar-config.json", "Path to server config file")
 
 	port := flag.String("port", "8080", "listen on port")
 
 	flag.Parse()
+
+	var err error
+
+	// load configuration
+	var cfg *ServerConfigInfo
+	cfg, err = ReadConfigFile(*cfgPath)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
+
+	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
+	googleOauthConfig.ClientID = cfg.GoogleClientID
+	googleOauthConfig.ClientID = cfg.GoogleClientSecret
 
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
@@ -83,7 +123,8 @@ func main() {
 	db.AutoMigrate(&WineInfo{})
 
 	if *loadSamples == true {
-		wines, err := ReadWinesFromFile("wine-list.json")
+		var wines []WineInfo
+		wines, err = ReadWinesFromFile("wine-list.json")
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
