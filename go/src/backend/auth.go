@@ -26,6 +26,19 @@ var (
 	oauthStateString = "random"
 )
 
+type GoogleOauth2Result struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Link          string `json:"link"`
+	Picture       string `json:"picture"`
+	Gender        string `json:"gender"`
+	Locale        string `json:"locale"`
+}
+
 // sends forbidden http response and returns false if the user isn't authenticated
 func EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	session, err := store.Get(r, SESSION_NAME)
