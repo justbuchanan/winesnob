@@ -1,6 +1,6 @@
 [
     {
-        "name": "RJ Spagnols En Primeur Italian Amarone (2, 14)",
+        "name": "Amarone",
         "variety": "amarone",
         "available": true,
         "red": true,
@@ -8,7 +8,7 @@
     },
 
     {
-        "name": "RJ Spagnols En Primeur Italian Super Tuscan (3,10)",
+        "name": "Super Tuscan",
         "variety": "super tuscan",
         "available": true,
         "red": true,
@@ -16,7 +16,7 @@
     },
 
     {
-        "name": "RJ Spagnols Black Forest (Chocolate Cherry) Port (11)",
+        "name": "Chocolate Cherry Port",
         "variety": "port",
         "available": true,
         "red": true,
@@ -24,7 +24,7 @@
     },
 
     {
-        "name": "WE White Merlot (9)",
+        "name": "White Merlot",
         "variety": "merlot",
         "available": true,
         "red": true,
@@ -32,7 +32,7 @@
     },
 
     {
-        "name": "RJ Spagnols En Primeur Trentino Italian Pinot Grigio (12)",
+        "name": "Pinot Grigio",
         "variety": "pinot grigio",
         "available": true,
         "red": false,
@@ -40,7 +40,7 @@
     },
 
     {
-        "name": "Eclipse Sonoma Dry Creek Chardonnay Wine (5)",
+        "name": "Sonoma Chardonnay",
         "variety": "chardonnay",
         "available": true,
         "red": false,
@@ -48,7 +48,7 @@
     },
 
     {
-        "name": "Winexpert Selection Original Luna Bianca (18)",
+        "name": "Luna Bianca",
         "variety": "luna bianca",
         "available": true,
         "red": false,
@@ -56,7 +56,7 @@
     },
 
     {
-        "name": "RJ Spagnols En Primeur Chile Pinot Noir (15)",
+        "name": "Chile Pinot Noir",
         "variety": "pinot noir",
         "available": true,
         "red": true,
@@ -64,7 +64,7 @@
     },
 
     {
-        "name": "RJ Spagnols Cellar Classic Winery Series Winemaker's Trio (16)",
+        "name": "Winemaker's Trio",
         "variety": "blend",
         "available": true,
         "red": true,
@@ -72,7 +72,7 @@
     },
 
     {
-        "name": "Eclipse Lodi Ranch 11 Cabernet Sauvignon (17)",
+        "name": "Cabernet Sauvignon",
         "variety": "cabernet sauvignon",
         "available": true,
         "red": true,
@@ -80,7 +80,7 @@
     },
 
     {
-        "name": "Eclipse Napa Valley Stag's Leap District Merlot (6)",
+        "name": "Stag's Leap Merlot",
         "variety": "merlot",
         "available": true,
         "red": true,
@@ -96,7 +96,7 @@
     },
 
     {
-        "name": "LE Washington Triumph Red Blend (20)",
+        "name": "Washington Triumph Red Blend",
         "variety": "washington blend",
         "available": true,
         "red": true,
@@ -104,7 +104,7 @@
     },
 
     {
-        "name": "LE Italian Super Tuscan (19)",
+        "name": "Super Tuscan",
         "variety": "super tuscan",
         "available": true,
         "red": true,
