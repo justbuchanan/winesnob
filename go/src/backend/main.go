@@ -50,14 +50,14 @@ func CreateHttpHandler() http.Handler {
 	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
 
-    router.HandleFunc("/oauth2/login", handleGoogleLogin)
-    router.HandleFunc("/oauth2/logout", handleGoogleLogout)
-    router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
-    router.HandleFunc("/oauth2/login-status", LoginStatusHandler)
+	router.HandleFunc("/oauth2/login", handleGoogleLogin)
+	router.HandleFunc("/oauth2/logout", handleGoogleLogout)
+	router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
+	router.HandleFunc("/oauth2/login-status", LoginStatusHandler)
 
 	// serve angular frontend
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
-    
+
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
 	return loggedRouter
@@ -83,7 +83,6 @@ func main() {
 	// setup schema
 	db.AutoMigrate(&WineInfo{})
 
-
 	if *loadSamples == true {
 		wines, err := ReadWinesFromFile("wine-list.json")
 		if err != nil {
@@ -106,7 +105,7 @@ func main() {
 
 	loggedRouter := CreateHttpHandler()
 	fmt.Println("Winesnob listening on port " + *port)
-	log.Fatal(http.ListenAndServe("0.0.0.0:" + *port, loggedRouter))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+*port, loggedRouter))
 }
 
 // Similar to string Join(), but adds an "and" appropriately
@@ -148,11 +147,13 @@ func WineDescriptorLookup(descriptor string) *WineInfo {
 	var bestMatch WineInfo
 	bestMatchR := WORST_ACCEPTABLE
 
-	if debug {fmt.Println("Looking for", descriptor)}
+	if debug {
+		fmt.Println("Looking for", descriptor)
+	}
 
 	for _, wine := range wines {
 		r := fuzzy.RankMatch(descriptor, wine.Name)
-		if (debug) {
+		if debug {
 			fmt.Printf("  %d ", r)
 			fmt.Println(wine.Name)
 		}
@@ -163,7 +164,9 @@ func WineDescriptorLookup(descriptor string) *WineInfo {
 	}
 
 	if bestMatchR < WORST_ACCEPTABLE {
-		if (debug) { fmt.Println("Found:", bestMatch.Name)}
+		if debug {
+			fmt.Println("Found:", bestMatch.Name)
+		}
 		return &bestMatch
 	} else {
 		return nil
@@ -247,29 +250,29 @@ func GenerateUniqueId() string {
 }
 
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-    url := googleOauthConfig.AuthCodeURL(oauthStateString)
-    http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 type GoogleOauth2Result struct {
-	ID string `json:"id"`
-	Email string `json:"email"`
-	VerifiedEmail bool `json:"verified_email"`
-	Name string `json:"name"`
-	GivenName string `json:"given_name"`
-	FamilyName string `json:"family_name"`
-	Link string `json:"link"`
-	Picture string `json:"picture"`
-	Gender string `json:"gender"`
-	Locale string `json:"locale"`
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Link          string `json:"link"`
+	Picture       string `json:"picture"`
+	Gender        string `json:"gender"`
+	Locale        string `json:"locale"`
 }
 
 // http://stackoverflow.com/questions/15323767/does-golang-have-if-x-in-construct-similar-to-python
 func stringInSlice(a string, list []string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
