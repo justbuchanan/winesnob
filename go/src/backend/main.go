@@ -231,6 +231,8 @@ func GenerateUniqueId() string {
 }
 
 func WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !EnsureLoggedIn(w, r) { return }
+
 	vars := mux.Vars(r)
 	wineId := vars["wineId"]
 
@@ -245,6 +247,8 @@ func WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !EnsureLoggedIn(w, r) { return }
+
 	decoder := json.NewDecoder(r.Body)
 	var wine WineInfo
 	err := decoder.Decode(&wine)
@@ -270,6 +274,8 @@ func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !EnsureLoggedIn(w, r) { return }
+
 	vars := mux.Vars(r)
 	wineId := vars["wineId"]
 
@@ -294,6 +300,8 @@ func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func WineHandler(w http.ResponseWriter, r *http.Request) {
+	if !EnsureLoggedIn(w, r) { return }
+
 	vars := mux.Vars(r)
 	wineId := vars["wineId"]
 
@@ -310,7 +318,8 @@ func WineHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wine)
 }
 
-func IsLoggedIn(r *http.Request) bool {
+// sends forbidden http response and returns false if the user isn't authenticated
+func EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
 		// TODO: handle error
@@ -319,7 +328,12 @@ func IsLoggedIn(r *http.Request) bool {
 	}
 
 	email := session.Values["email"]
-	return email != nil
+	if email != nil && stringInSlice(email.(string), ALLOWED_USERS) {
+		return true
+	}
+
+	http.Error(w, "need to authenticate", http.StatusForbidden)
+	return false
 }
 
 func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
@@ -340,10 +354,7 @@ func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsLoggedIn(r) {
-		http.Error(w, "need to authenticate", http.StatusForbidden)
-		return
-	}
+	if !EnsureLoggedIn(w, r) { return }
 
 	// TODO: separate wine lists
 

@@ -1,4 +1,5 @@
 * fuzzy search for 'describe'
+* mock auth for testing
 * refactor item delete
   * show deletion immediately, dont require a page refresh
   * animation?
