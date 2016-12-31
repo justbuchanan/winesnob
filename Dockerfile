@@ -31,6 +31,8 @@ COPY protractor.conf.js tslint.json karma.conf.js angular-cli.json ./
 COPY src ./src
 RUN ng build --env=prod
 
+RUN go build backend
+
 VOLUME "/data"
 EXPOSE 8080
-CMD ["go", "run", "go/src/backend/main.go", "--dbpath", "/data/cellar.sqlite3db"]
+CMD ["./backend", "--dbpath", "/data/cellar.sqlite3db"]
