@@ -5,6 +5,7 @@ import (
     "backend/apiai"
     "net/http"
     "encoding/json"
+    "log"
 )
 
 
@@ -35,6 +36,7 @@ func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 
     wineDesc := req.Result.Parameters["wine-descriptor"].(string)
     wine := WineDescriptorLookup(wineDesc)
+    fmt.Println(wine)
     if wine != nil {
         resp.Speech = wine.Name + ": " + wine.Description
     } else {
@@ -68,7 +70,15 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     intent := req.Result.Metadata.IntentName
-    resp := intentHandlers[intent](req)
+    handler := intentHandlers[intent]
+    if handler == nil {
+        log.Println("No handler found for intent: '" + intent + "'")
+
+        w.WriteHeader(http.StatusBadRequest)
+
+        return
+    }
+    resp := handler(req)
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(resp)

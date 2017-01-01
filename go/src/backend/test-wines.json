@@ -14,7 +14,9 @@
     {
         "name": "amarone",
         "available": true,
-        "red": true
+        "red": true,
+        "Amarone description"
+
     },
 
     {

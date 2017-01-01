@@ -27,6 +27,13 @@ func TestJoinWordSeries(t *testing.T) {
 }
 
 func TestApi(t *testing.T) {
+	var err error
+
+	err = InitConfigInfo("../../../cellar-config.json.example")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	db, _ = gorm.Open("sqlite3", ":memory:")
 	defer db.Close()
 	db.LogMode(false)
@@ -39,7 +46,6 @@ func TestApi(t *testing.T) {
 	defer ts.Close()
 
 	var res *http.Response
-	var err error
 
 	// test authentication required
 	res, err = http.Get(ts.URL + "/api/wines")
@@ -66,10 +72,65 @@ func TestApi(t *testing.T) {
 		// TODO
 	}
 
+	fmt.Println("Trying empty action response")
 	actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
-	fmt.Println(actionResponse)
+	assert.Nil(t, actionResponse)
 
 	RunTestWineDescriptorLookup(t)
+
+
+
+	// request wine.describe(amarone)
+	json_test := []byte(`
+	{
+	  "id": "1d6c7acd-745e-4bbd-88f8-d85dd74efa42",
+	  "timestamp": "2017-01-01T03:17:25.553Z",
+	  "result": {
+	    "source": "agent",
+	    "resolvedQuery": "tell me about the amarone",
+	    "action": "",
+	    "actionIncomplete": false,
+	    "parameters": {
+	      "wine-descriptor": "amarone"
+	    },
+	    "contexts": [],
+	    "metadata": {
+	      "intentId": "7b048d28-0bef-4b61-8e7a-c1cda95e01bc",
+	      "webhookUsed": "true",
+	      "webhookForSlotFillingUsed": "false",
+	      "intentName": "wine.describe"
+	    },
+	    "fulfillment": {
+	      "speech": "I'm sorry, I couldn't find a wine matching that description",
+	      "source": "",
+	      "displayText": "",
+	      "messages": [
+	        {
+	          "type": 0,
+	          "speech": "I'm sorry, I couldn't find a wine matching that description"
+	        }
+	      ],
+	      "data": {}
+	    },
+	    "score": 1
+	  },
+	  "status": {
+	    "code": 200,
+	    "errorType": "success"
+	  },
+	  "sessionId": "e6a263ca-6ded-45df-bf76-3c960856e0bd"
+	}`)
+
+	var testReq apiai.ActionRequest
+	err = json.Unmarshal(json_test, &testReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testResp := GetActionResponse(t, ts, &testReq)
+	assert.NotNil(t, testResp)
+	assert.Equal(t, "amarone: Amarone description", testResp.Speech)
+	fmt.Println("winner!", testResp.Speech)
 }
 
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
@@ -80,14 +141,16 @@ func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionReque
 		return nil
 	}
 
-	var apiResp apiai.ActionResponse
 	body, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
+		return nil
 	}
+	var apiResp apiai.ActionResponse
 	err = json.Unmarshal(body, &apiResp)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
+		return nil
 	}
 
 	return &apiResp

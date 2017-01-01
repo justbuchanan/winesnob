@@ -86,6 +86,24 @@ func ReadConfigFile(filename string) (cfgRet *ServerConfigInfo, err error) {
 	return &cfg, nil
 }
 
+func InitConfigInfo(filename string) error {
+	// load configuration
+	cfg, err := ReadConfigFile(filename)
+	if err != nil {
+		return err
+	}
+
+	// init cookie store
+	store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
+
+	// global oauth config
+	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
+	googleOauthConfig.ClientID = cfg.GoogleClientID
+	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
+
+	return nil
+}
+
 func main() {
 	// TODO: seed rng
 
@@ -99,18 +117,11 @@ func main() {
 
 	var err error
 
-	// load configuration
-	var cfg *ServerConfigInfo
-	cfg, err = ReadConfigFile(*cfgPath)
+	err = InitConfigInfo(*cfgPath)
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
-
-	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
-	googleOauthConfig.ClientID = cfg.GoogleClientID
-	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
 
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
