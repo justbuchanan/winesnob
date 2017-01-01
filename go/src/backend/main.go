@@ -110,7 +110,7 @@ func main() {
 
 	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
 	googleOauthConfig.ClientID = cfg.GoogleClientID
-	googleOauthConfig.ClientID = cfg.GoogleClientSecret
+	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
 
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
