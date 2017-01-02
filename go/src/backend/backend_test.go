@@ -83,42 +83,17 @@ func TestApi(t *testing.T) {
 	// request wine.describe(amarone)
 	json_test := []byte(`
 	{
-	  "id": "1d6c7acd-745e-4bbd-88f8-d85dd74efa42",
-	  "timestamp": "2017-01-01T03:17:25.553Z",
 	  "result": {
 	    "source": "agent",
 	    "resolvedQuery": "tell me about the amarone",
-	    "action": "",
-	    "actionIncomplete": false,
 	    "parameters": {
 	      "wine-descriptor": "amarone"
 	    },
 	    "contexts": [],
 	    "metadata": {
-	      "intentId": "7b048d28-0bef-4b61-8e7a-c1cda95e01bc",
-	      "webhookUsed": "true",
-	      "webhookForSlotFillingUsed": "false",
 	      "intentName": "wine.describe"
-	    },
-	    "fulfillment": {
-	      "speech": "I'm sorry, I couldn't find a wine matching that description",
-	      "source": "",
-	      "displayText": "",
-	      "messages": [
-	        {
-	          "type": 0,
-	          "speech": "I'm sorry, I couldn't find a wine matching that description"
-	        }
-	      ],
-	      "data": {}
-	    },
-	    "score": 1
-	  },
-	  "status": {
-	    "code": 200,
-	    "errorType": "success"
-	  },
-	  "sessionId": "e6a263ca-6ded-45df-bf76-3c960856e0bd"
+	    }
+	  }
 	}`)
 
 	var testReq apiai.ActionRequest
