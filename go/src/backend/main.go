@@ -38,6 +38,8 @@ type ServerConfigInfo struct {
 	GoogleClientSecret string
 	BaseURL string // example: https://cellar.justbuchanan.com:3000
 	CookieSecret string
+	ApiaiAuthUsername string
+	ApiaiAuthPassword string
 }
 
 var db *gorm.DB
@@ -100,6 +102,14 @@ func InitConfigInfo(filename string) error {
 	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
 	googleOauthConfig.ClientID = cfg.GoogleClientID
 	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
+
+	// http basic auth for apiai
+	APIAI_AUTH_USERNAME = cfg.ApiaiAuthUsername
+	APIAI_AUTH_PASSWORD = cfg.ApiaiAuthPassword
+
+	if APIAI_AUTH_USERNAME == "" || APIAI_AUTH_PASSWORD == "" {
+		log.Fatal("Apiai basic auth not set correctly in config file:", filename)
+	}
 
 	return nil
 }

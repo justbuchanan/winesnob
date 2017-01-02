@@ -8,6 +8,12 @@ import (
     "log"
 )
 
+// these values are set via the server config file
+var (
+    APIAI_AUTH_USERNAME = "apiai"
+    APIAI_AUTH_PASSWORD = "?"
+)
+
 
 func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
     var resp apiai.ActionResponse
@@ -54,6 +60,13 @@ func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
 }
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+    // http basic auth
+    user, pass, _ := r.BasicAuth()
+    if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
+        w.WriteHeader(http.StatusForbidden)
+        return
+    }
+
     decoder := json.NewDecoder(r.Body)
     var req apiai.ActionRequest
     err := decoder.Decode(&req)

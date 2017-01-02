@@ -2,5 +2,7 @@
     "GoogleClientID": "get from google dev console",
     "GoogleClientSecret": "get from google dev console",
     "BaseURL": "https://cellar.justbuchanan.com",
-    "CookieSecret": "generate this string randomly"
+    "CookieSecret": "generate this string randomly",
+    "ApiaiAuthUsername": "apiai",
+    "ApiaiAuthPassword": "ensure this matches the fulfillment password on apiai.ai"
 }
