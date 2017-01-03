@@ -106,6 +106,20 @@ func TestApi(t *testing.T) {
 	assert.NotNil(t, testResp)
 	assert.Equal(t, "amarone: Amarone description", testResp.Speech)
 	fmt.Println("winner!", testResp.Speech)
+
+
+	// clear db
+	ClearDb()
+	var count uint64
+	db.Model(&WineInfo{}).Count(&count)
+	assert.Equal(t, 0, count)
+
+	LoadWinesFromJsonIntoDb("../../../wine-list.json")
+
+	// same request as before, but against a different wine list
+	testResp = GetActionResponse(t, ts, &testReq)
+	assert.NotNil(t, testResp)
+	fmt.Println("Winner!", testResp.Speech)
 }
 
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
@@ -145,10 +159,14 @@ func ForceAuthenticate(req *http.Request, email string) {
 	// fmt.Println(session)
 }
 
-func RunTestWineDescriptorLookup(t *testing.T) {
-	wines, err := ReadWinesFromFile("test-wines.json")
+func ClearDb() {
+	db.Where("").Delete(&WineInfo{})
+}
+
+func LoadWinesFromJsonIntoDb(filename string) {
+	wines, err := ReadWinesFromFile(filename)
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// insert into database
@@ -160,6 +178,10 @@ func RunTestWineDescriptorLookup(t *testing.T) {
 			os.Exit(1)
 		}
 	}
+}
+
+func RunTestWineDescriptorLookup(t *testing.T) {
+	LoadWinesFromJsonIntoDb("test-wines.json")
 	fmt.Println("Loaded test wines into db")
 
 	// exact match
