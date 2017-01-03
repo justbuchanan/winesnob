@@ -8,13 +8,6 @@ import (
     "log"
 )
 
-// these values are set via the server config file
-var (
-    APIAI_AUTH_USERNAME = "apiai"
-    APIAI_AUTH_PASSWORD = "?"
-)
-
-
 func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
     var resp apiai.ActionResponse
 
@@ -38,18 +31,18 @@ func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
 }
 
 func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
-    var resp apiai.ActionResponse
-
     wineDesc := req.Result.Parameters["wine-descriptor"].(string)
     wine := WineDescriptorLookup(wineDesc)
-    fmt.Println(wine)
+    var speech string
     if wine != nil {
-        resp.Speech = wine.Name + ": " + wine.Description
+        speech = wine.Name + ": " + wine.Description
     } else {
-        resp.Speech = "I'm sorry, I couldn't find a wine matching that description"
+        speech = "I'm sorry, I couldn't find a wine matching that description"
     }
 
-    return &resp
+    return &apiai.ActionResponse{
+        Speech: speech,
+    }
 }
 
 func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
@@ -59,14 +52,7 @@ func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
     }
 }
 
-func WebhookHandler(w http.ResponseWriter, r *http.Request) {
-    // http basic auth
-    user, pass, _ := r.BasicAuth()
-    if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
-        w.WriteHeader(http.StatusForbidden)
-        return
-    }
-
+func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
     decoder := json.NewDecoder(r.Body)
     var req apiai.ActionRequest
     err := decoder.Decode(&req)

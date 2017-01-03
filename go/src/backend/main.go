@@ -45,10 +45,42 @@ type ServerConfigInfo struct {
 var db *gorm.DB
 var store *sessions.CookieStore
 
+
+// these values are set via the server config file
+var (
+    APIAI_AUTH_USERNAME = "apiai"
+    APIAI_AUTH_PASSWORD = "?"
+)
+
+func BasicAuthHandler(username string, password string) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	    user, pass, _ := r.BasicAuth()
+	    if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
+	        w.WriteHeader(http.StatusForbidden)
+	        return
+	    }
+	})
+}
+
+type BasicAuthGate struct {
+	username, password string
+	handler http.Handler
+}
+
+func (ba *BasicAuthGate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func CreateHttpHandler() http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
+	// apiai webhook for "fulfillment"
+	router.HandleFunc("/webhook", func (w http.ResponseWriter, r *http.Request) {
+		// http basic auth
+
+	    // call fulfillment handler
+	    ApiaiWebhookHandler(w, r)
+	}).Methods("POST")
 
 	// "api" routes
 	api := router.PathPrefix("/api").Subrouter()

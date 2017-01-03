@@ -26,6 +26,8 @@ func TestJoinWordSeries(t *testing.T) {
 	}
 }
 
+
+
 func TestApi(t *testing.T) {
 	var err error
 
@@ -77,7 +79,7 @@ func TestApi(t *testing.T) {
 	assert.Nil(t, actionResponse)
 
 	RunTestWineDescriptorLookup(t)
-
+	fmt.Println("-- ran RunTestWineDescriptorLookup()")
 
 
 	// request wine.describe(amarone)
@@ -96,11 +98,13 @@ func TestApi(t *testing.T) {
 	  }
 	}`)
 
+	fmt.Println("Testing wine.describe(amarone)")
 	var testReq apiai.ActionRequest
 	err = json.Unmarshal(json_test, &testReq)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("parse error:", err)
 	}
+	fmt.Println(testReq)
 
 	testResp := GetActionResponse(t, ts, &testReq)
 	assert.NotNil(t, testResp)
