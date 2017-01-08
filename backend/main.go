@@ -234,6 +234,7 @@ func ReadWinesFromFile(filename string) (wines []WineInfo, err error) {
 // does a fuzzy match against the all wine names and returns the top one if any
 // match decently.
 func WineDescriptorLookup(descriptor string) *WineInfo {
+	descriptor = strings.ToLower(descriptor)
 	var wines []WineInfo
 	db.Find(&wines)
 
@@ -248,7 +249,7 @@ func WineDescriptorLookup(descriptor string) *WineInfo {
 	}
 
 	for _, wine := range wines {
-		r := fuzzy.RankMatch(descriptor, wine.Name)
+		r := fuzzy.RankMatch(descriptor, strings.ToLower(wine.Name))
 		if debug {
 			fmt.Printf("  %d ", r)
 			fmt.Println(wine.Name)
