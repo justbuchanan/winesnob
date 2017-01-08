@@ -33,7 +33,7 @@ RUN ng build --env=prod
 
 RUN go build backend
 
-VOLUME "/data"
+VOLUME "/data/cellar.sqlite3db"
 VOLUME "/etc/cellar-config.json"
 EXPOSE 8080
 CMD ["./backend", "--dbpath", "/data/cellar.sqlite3db", "--config", "cellar-config.json"]
