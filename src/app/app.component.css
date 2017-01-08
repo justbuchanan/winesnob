@@ -36,7 +36,7 @@ md-toolbar.header p {
   align-self: center;
   display: flex;
   flex-flow: column;
-  max-height: 100vh;
+  height: 100vh;
 }
 
 .content-container {

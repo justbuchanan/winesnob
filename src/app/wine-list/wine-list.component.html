@@ -4,4 +4,9 @@
             <app-wine [wine]="wine" (delete)="this.deleteWine($event)"></app-wine>
         </div>
     </ul>
+
+    <div *ngIf="!wines.size" style="text-align: center;">
+    You don't have any wines yet... Add one by clicking the "+" button in the bottom right .
+    </div>
+
 </div>
