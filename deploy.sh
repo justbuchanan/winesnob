@@ -7,9 +7,9 @@ function remote_run() {
 }
 
 echo "=> Prepare remote server for push"
-remote_run "git checkout master"
+remote_run "git checkout wine"
 
-branch="oauth2"
+branch="master"
 
 echo "=> Push latest code to server"
 git push prod $branch
