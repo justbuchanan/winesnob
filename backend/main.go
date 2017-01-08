@@ -180,9 +180,12 @@ func main() {
 
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
-	// TODO: error handling?
-	db, _ = gorm.Open("sqlite3", *dbPath)
+	db, err = gorm.Open("sqlite3", *dbPath)
 	defer db.Close()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 	db.LogMode(true)
 
 	// setup schema
