@@ -238,7 +238,7 @@ func WineDescriptorLookup(descriptor string) *WineInfo {
 	var wines []WineInfo
 	db.Find(&wines)
 
-	const debug = false
+	const debug = true
 
 	const WORST_ACCEPTABLE = 6
 	var bestMatch WineInfo
