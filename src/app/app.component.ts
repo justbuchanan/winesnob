@@ -18,16 +18,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.getEmail().then(email => { this.username = email; })
-    // this.authService.login().toPromise().then(resp => {
-    //   this.username = this.authService.getEmail();
-    // });
-    // console.log(this.username);
-  }
-
-  logoutClicked(): void {
-    // this.authService.logout();
-      // this.ro
-    // });
   }
 
   addWineClicked(event) {
