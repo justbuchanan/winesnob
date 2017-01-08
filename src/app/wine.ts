@@ -4,5 +4,4 @@ export class Wine {
     description: string;
     available: boolean;
     red: boolean;
-    year: number;
 }

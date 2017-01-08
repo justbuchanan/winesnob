@@ -26,7 +26,6 @@ const SESSION_NAME = "cellar"
 type WineInfo struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Year        int64  `json:"year"`
 	Red         bool   `json:"red"`
 	Available   bool   `json:"available"`
 

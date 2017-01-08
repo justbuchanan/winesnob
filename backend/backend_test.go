@@ -56,8 +56,6 @@ func TestApi(t *testing.T) {
 		t.Fatal("Api should be blocked when not authenticated")
 	}
 
-	// var sess *Session
-	// sess, err = store.Getjk
 	req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
 	ForceAuthenticate(req, "justbuchanan@gmail.com")
 	fmt.Println("Force-authenticated as justbuchanan@gmail.com")
