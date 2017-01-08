@@ -14,6 +14,8 @@ import { MaterialModule } from '@angular/material';
 import { MdDialogModule } from '@angular/material/dialog';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
+import { Angular2FontawesomeModule } from 'angular2-fontawesome/angular2-fontawesome';
+
 import { AppComponent } from './app.component';
 import { WineComponent } from './wine/wine.component';
 import { WineEditorComponent } from './wine-editor/wine-editor.component';
@@ -61,6 +63,7 @@ export function httpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptio
     MaterialModule,
     MaterialModule.forRoot(),
     FlexLayoutModule.forRoot(),
+    Angular2FontawesomeModule,
   ],
   providers: [
     MdIconRegistry,

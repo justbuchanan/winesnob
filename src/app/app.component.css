@@ -15,11 +15,6 @@ a[md-button] {
     color: #722f37;
 }
 
-#left-spacer {
-    display: block;
-    width: 56px; /* width of fab button */
-}
-
 md-toolbar.header p {
     font-size: 10pt;
 }
@@ -42,4 +37,13 @@ md-toolbar.header p {
 .content-container {
   flex: 1;
   overflow-y: auto;
+}
+
+a.github {
+  color: white;
+}
+
+.info-text {
+  text-align: center;
+  color: gray;
 }

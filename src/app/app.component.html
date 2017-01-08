@@ -4,27 +4,33 @@
 
 <md-toolbar [color]="primary" class="header">
     <span>{{title}}</span>
+    
     <span style="flex: 1 1 auto;"></span>
+
     <md-icon>search</md-icon>
     <md-input [(ngModel)]="query" placeholder='Search'></md-input>
+
     <span style="flex: 1 1 auto;"></span>
+
     <a md-button [color]="warn" href="/oauth2/logout">Logout</a>
-    <!-- <button md-button (click)="logoutClicked()">Logout</button> -->
 </md-toolbar>
 
 <div class="content-container">
-    <app-wine-list [query]="query"></app-wine-list>
-    <router-outlet></router-outlet>
-</div>
 
-<md-toolbar [color]="warm" class="footer">
-    <!-- <div id="left-spacer"></div> -->
-
-    <a href="https://github.com/justbuchanan/winesnob">GitHub</a>
-
+    <div class="info-text">
     <p *ngIf="username">This wine list will be available to google home devices that have the "wine master" app installed/enabled and that are signed into the '{{username}}' account.</p>
     <p *ngIf="!username">Please login to a pre-approved google account to use this app.
     </p>
+    </div>
+
+    <app-wine-list [query]="query"></app-wine-list>
+    <!-- <router-outlet></router-outlet> -->
+</div>
+
+<md-toolbar [color]="warm" class="footer">
+    <a class="github" href="https://github.com/justbuchanan/winesnob">
+        <fa name="github" [border]=false></fa>
+    </a>
 
     <span style="flex: 1 1 auto;"></span>
     <a md-button id="add-button" routerLink="/create"><md-icon>add</md-icon></a>
