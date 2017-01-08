@@ -38,4 +38,3 @@ Thumbs.db
 *.sqlite3db
 
 cellar-config.json
-/backend

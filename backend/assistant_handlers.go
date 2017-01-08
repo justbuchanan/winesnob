@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/apiai"
+	"github.com/justbuchanan/winesnob/backend/apiai"
 	"encoding/json"
 	"fmt"
 	"log"

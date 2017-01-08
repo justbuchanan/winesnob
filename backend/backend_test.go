@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 	// "github.com/gorilla/sessions"
-	"backend/apiai"
+	"github.com/justbuchanan/winesnob/backend/apiai"
 	"bytes"
 	"encoding/json"
 	"fmt"
