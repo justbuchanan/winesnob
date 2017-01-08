@@ -1,6 +1,6 @@
 ---
 wine:
-    build: /home/justin/cellar/
+    build: ./
     environment:
         - VIRTUAL_HOST=cellar.justbuchanan.com
         - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
