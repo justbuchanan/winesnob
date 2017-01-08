@@ -32,10 +32,11 @@ type WineInfo struct {
 	Id string `json:"id"`
 }
 
+// see cellar-config.json.example for info
 type ServerConfigInfo struct {
 	GoogleClientID     string
 	GoogleClientSecret string
-	BaseURL            string // example: https://cellar.justbuchanan.com:3000
+	BaseURL            string
 	CookieSecret       string
 	ApiaiAuthUsername  string
 	ApiaiAuthPassword  string
@@ -138,6 +139,26 @@ func InitConfigInfo(filename string) error {
 	return nil
 }
 
+func LoadSamplesIntoDb(filename string) error {
+	wines, err := ReadWinesFromFile(filename)
+	if err != nil {
+		return err
+	}
+
+	// insert into database
+	for _, wine := range wines {
+		wine.Id = GenerateUniqueId()
+		err = db.Create(&wine).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Loaded sample wines")
+
+	return nil
+}
+
 func main() {
 	// TODO: seed rng
 
@@ -167,25 +188,12 @@ func main() {
 	// setup schema
 	db.AutoMigrate(&WineInfo{})
 
-	if *loadSamples == true {
-		var wines []WineInfo
-		wines, err = ReadWinesFromFile("wine-list.json")
+	if *loadSamples {
+		err = LoadSamplesIntoDb("wine-list.json")
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
 		}
-
-		// insert into database
-		for _, wine := range wines {
-			wine.Id = GenerateUniqueId()
-			err = db.Create(&wine).Error
-			if err != nil {
-				log.Fatal(err)
-				os.Exit(1)
-			}
-		}
-
-		fmt.Println("Loaded sample wines")
 	}
 
 	loggedRouter := CreateHttpHandler()
