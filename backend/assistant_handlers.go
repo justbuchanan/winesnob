@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/justbuchanan/winesnob/backend/apiai"
 	"encoding/json"
 	"fmt"
+	"github.com/justbuchanan/winesnob/backend/apiai"
 	"log"
 	"net/http"
 )
@@ -45,11 +45,30 @@ func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
+// TODO: actually implement this
 func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
 	food := req.Result.Parameters["food"].(string)
 	return &apiai.ActionResponse{
 		Speech: "I'd recommend the amarone, it goes very well with " + food,
 	}
+}
+
+// TODO: actually implement this
+func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
+	// TODO
+	return &apiai.ActionResponse{}
+}
+
+// TODO: actually implement this
+func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
+	// TODO
+	return &apiai.ActionResponse{}
+}
+
+// TODO: actually implement this
+func Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
+	// TODO
+	return &apiai.ActionResponse{}
 }
 
 func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,9 +82,12 @@ func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	intentHandlers := map[string](func(apiai.ActionRequest) *apiai.ActionResponse){
-		"wine.list":     Intent_Wine_List,
-		"wine.describe": Intent_Wine_Describe,
-		"wine.pair":     Intent_Wine_Pair,
+		"wine.list":               Intent_Wine_List,
+		"wine.describe":           Intent_Wine_Describe,
+		"wine.pair":               Intent_Wine_Pair,
+		"wine.remove-inventory":   Intent_Wine_Remove,
+		"wine.add-inventory":      Intent_Wine_Add,
+		"wine.query-availability": Intent_Wine_Query,
 	}
 
 	intent := req.Result.Metadata.IntentName

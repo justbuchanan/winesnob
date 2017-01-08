@@ -9,10 +9,10 @@ import (
 	"os"
 	"testing"
 	// "github.com/gorilla/sessions"
-	"github.com/justbuchanan/winesnob/backend/apiai"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/justbuchanan/winesnob/backend/apiai"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 )

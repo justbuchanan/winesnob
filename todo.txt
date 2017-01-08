@@ -6,7 +6,6 @@
   * animation?
   * handle logic in part list, not part?
   * dialog
-* fix vertical sizing of components
 * fix issue where agent repeats previous response mindlessly
 * fix displayText property for apiai response
 * mock auth for testing
