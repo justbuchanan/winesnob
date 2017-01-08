@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 function remote_run() {
     ssh justbuchanan.com "cd cellar; $1"
 }
