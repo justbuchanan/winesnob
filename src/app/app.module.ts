@@ -12,6 +12,7 @@ import { MdCheckboxModule } from '@angular/material/checkbox';
 import { NgPipesModule } from 'ng-pipes';
 import { MaterialModule } from '@angular/material';
 import { MdDialogModule } from '@angular/material/dialog';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { AppComponent } from './app.component';
 import { WineComponent } from './wine/wine.component';
@@ -59,6 +60,7 @@ export function httpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptio
     NgPipesModule,
     MaterialModule,
     MaterialModule.forRoot(),
+    FlexLayoutModule.forRoot(),
   ],
   providers: [
     MdIconRegistry,

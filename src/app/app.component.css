@@ -3,22 +3,16 @@ md-toolbar {
     color: white;
 }
 
-a[md-button] {
-    background: #DECB90;
-    color: #722f37;
-}
-
-.content-container {
-    overflow-y: auto;
-    height: calc(100% - 128px);
-    width: 100%;
-}
-
 md-toolbar.footer p {
     font-size: 12pt;
     text-align: center;
     margin-left: 50px;
     margin-right: 50px;
+}
+
+a[md-button] {
+    background: #DECB90;
+    color: #722f37;
 }
 
 #left-spacer {
@@ -28,4 +22,24 @@ md-toolbar.footer p {
 
 md-toolbar.header p {
     font-size: 10pt;
+}
+
+.flex-container {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.flex-item {
+  box-sizing: border-box;
+  width: 100%;
+  align-self: center;
+  display: flex;
+  flex-flow: column;
+  max-height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+  overflow-y: auto;
 }
