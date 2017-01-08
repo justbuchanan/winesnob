@@ -26,8 +26,6 @@ func TestJoinWordSeries(t *testing.T) {
 	}
 }
 
-
-
 func TestApi(t *testing.T) {
 	var err error
 
@@ -81,7 +79,6 @@ func TestApi(t *testing.T) {
 	RunTestWineDescriptorLookup(t)
 	fmt.Println("-- ran RunTestWineDescriptorLookup()")
 
-
 	// request wine.describe(amarone)
 	json_test := []byte(`
 	{
@@ -110,7 +107,6 @@ func TestApi(t *testing.T) {
 	assert.NotNil(t, testResp)
 	assert.Equal(t, "amarone: Amarone description", testResp.Speech)
 	fmt.Println("winner!", testResp.Speech)
-
 
 	// clear db
 	ClearDb()
