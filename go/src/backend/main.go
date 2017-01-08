@@ -34,53 +34,44 @@ type WineInfo struct {
 }
 
 type ServerConfigInfo struct {
-	GoogleClientID string
+	GoogleClientID     string
 	GoogleClientSecret string
-	BaseURL string // example: https://cellar.justbuchanan.com:3000
-	CookieSecret string
-	ApiaiAuthUsername string
-	ApiaiAuthPassword string
+	BaseURL            string // example: https://cellar.justbuchanan.com:3000
+	CookieSecret       string
+	ApiaiAuthUsername  string
+	ApiaiAuthPassword  string
 }
 
 var db *gorm.DB
 var store *sessions.CookieStore
 
-
 // these values are set via the server config file
 var (
-    APIAI_AUTH_USERNAME = "apiai"
-    APIAI_AUTH_PASSWORD = "?"
+	APIAI_AUTH_USERNAME = "apiai"
+	APIAI_AUTH_PASSWORD = "?"
 )
 
-func BasicAuthHandler(username string, password string) {
+func BasicAuthHandler(username string, password string, next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	    user, pass, _ := r.BasicAuth()
-	    if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
-	        w.WriteHeader(http.StatusForbidden)
-	        return
-	    }
+		user, pass, _ := r.BasicAuth()
+		// if incorrect credentials, forbid access and return
+		if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		// if everything checks out, run next handler
+		next(w, r)
 	})
-}
-
-type BasicAuthGate struct {
-	username, password string
-	handler http.Handler
-}
-
-func (ba *BasicAuthGate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func CreateHttpHandler() http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// apiai webhook for "fulfillment"
-	router.HandleFunc("/webhook", func (w http.ResponseWriter, r *http.Request) {
-		// http basic auth
-
-	    // call fulfillment handler
-	    ApiaiWebhookHandler(w, r)
-	}).Methods("POST")
+	router.Handle("/webhook",
+		BasicAuthHandler(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD,
+			ApiaiWebhookHandler)).Methods("POST")
 
 	// "api" routes
 	api := router.PathPrefix("/api").Subrouter()
@@ -96,8 +87,10 @@ func CreateHttpHandler() http.Handler {
 	router.HandleFunc("/oauth2/login-status", LoginStatusHandler)
 
 	// serve angular frontend
+	// note: it must first be built with `ng build`
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
 
+	// log all requests
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
 	return loggedRouter
@@ -297,7 +290,6 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
-
 
 // http://stackoverflow.com/questions/15323767/does-golang-have-if-x-in-construct-similar-to-python
 func stringInSlice(a string, list []string) bool {
