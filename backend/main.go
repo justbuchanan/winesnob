@@ -293,11 +293,6 @@ func GenerateUniqueId() string {
 	}
 }
 
-func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	url := googleOauthConfig.AuthCodeURL(oauthStateString)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-}
-
 // http://stackoverflow.com/questions/15323767/does-golang-have-if-x-in-construct-similar-to-python
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {

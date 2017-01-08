@@ -116,6 +116,11 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 func handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
