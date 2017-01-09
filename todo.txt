@@ -1,6 +1,4 @@
-* implement other intents
-  * add / delete wines
-  * stop description
+* implement "stop description" command
 * refactor item delete
   * show deletion immediately, dont require a page refresh
   * animation?

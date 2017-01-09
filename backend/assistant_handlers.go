@@ -10,7 +10,7 @@ import (
 
 func WineNotFoundResponse() *apiai.ActionResponse {
 	return &apiai.ActionResponse{
-		Speech: "I'm sorry, I couldn't find a wine matching that description"
+		Speech: "I'm sorry, I couldn't find a wine matching that description",
 	}
 }
 
@@ -39,16 +39,13 @@ func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
 func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 	wine := WineDescriptorLookup(wineDesc)
-	var speech string
-	if wine != nil {
-		speech = wine.Name + ": " + wine.Description
-	} else {
+
+	if wine == nil {
 		return WineNotFoundResponse()
-		// speech = "I'm sorry, I couldn't find a wine matching that description"
 	}
 
 	return &apiai.ActionResponse{
-		Speech: speech,
+		Speech: wine.Name + ": " + wine.Description,
 	}
 }
 
@@ -60,46 +57,79 @@ func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
-// TODO: actually implement this
 func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
-	// TODO
-	return &apiai.ActionResponse{}
-}
-
-// func LookupWineDescriptorOrFail(descriptor string) *WineInfo {
-// 	wine := WineDescriptorLookup(wineDesc)
-// 	if wine == nil {
-
-// 	}
-	
-// }
-
-// TODO: actually implement this
-func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
-	// wineDesc := req.Result.Parameters["wine-descriptor"].(string)
-	// wine := LookupWineDescriptorOrFail(wineDesc)
-	// if wine == nil {
-	// 	return
-	// }
-
-	// find closest match by descriptor
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+	wine := WineDescriptorLookup(wineDesc)
 
-	if wine != nil {
-		// TODO: mark this wine as available OR say that it's already available
-	} else {
-		// TODO: create new wine and say what happened
-		// TODO: how to know if it's red or not?
+	if wine == nil {
+		return WineNotFoundResponse()
 	}
 
-	// TODO
-	return &apiai.ActionResponse{}
+	if !wine.Available {
+		return &apiai.ActionResponse{
+			Speech: "Yes, I know there's no " + wine.Name + " available",
+		}
+	}
+
+	// mark unavailable
+	wine.Available = false
+	err := db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	if err != nil {
+		return &apiai.ActionResponse{
+			Speech: "Error", // TODO
+		}
+	}
+
+	return &apiai.ActionResponse{
+		Speech: "Noted, there's no more " + wine.Name + " left",
+	}
 }
 
-// TODO: actually implement this
+func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
+	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+	wine := WineDescriptorLookup(wineDesc)
+
+	if wine == nil {
+		return WineNotFoundResponse()
+	}
+
+	if wine.Available {
+		return &apiai.ActionResponse{
+			Speech: "Yes, I know we have " + wine.Name,
+		}
+	}
+
+	// mark as available
+	wine.Available = true
+	err := db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	if err != nil {
+		return &apiai.ActionResponse{
+			Speech: "Error", // TODO
+		}
+	}
+
+	return &apiai.ActionResponse{
+		Speech: "Noted, we now have " + wine.Name,
+	}
+}
+
 func Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
-	// TODO
-	return &apiai.ActionResponse{}
+	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+	wine := WineDescriptorLookup(wineDesc)
+
+	if wine == nil {
+		return WineNotFoundResponse()
+	}
+
+	if wine.Available {
+		return &apiai.ActionResponse{
+			Speech: "Yes, we do have " + wine.Name,
+		}
+	} else {
+		return &apiai.ActionResponse{
+			Speech: "No, we don't have any of the " + wine.Name + " available",
+		}
+	}
 }
 
 func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +147,7 @@ func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		"wine.describe":           Intent_Wine_Describe,
 		"wine.pair":               Intent_Wine_Pair,
 		"wine.mark-unavailable":   Intent_Wine_Remove,
-		"wine.mark-available":      Intent_Wine_Add,
+		"wine.mark-available":     Intent_Wine_Add,
 		"wine.query-availability": Intent_Wine_Query,
 	}
 
