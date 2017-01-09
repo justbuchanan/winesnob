@@ -15,6 +15,7 @@ import (
 	"github.com/justbuchanan/winesnob/backend/apiai"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"strings"
 )
 
 func TestJoinWordSeries(t *testing.T) {
@@ -29,7 +30,7 @@ func TestJoinWordSeries(t *testing.T) {
 func TestApi(t *testing.T) {
 	var err error
 
-	err = InitConfigInfo("../../../cellar-config.json.example")
+	err = InitConfigInfo("../cellar-config.json.example")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +79,7 @@ func TestApi(t *testing.T) {
 	fmt.Println("-- ran RunTestWineDescriptorLookup()")
 
 	// request wine.describe(amarone)
-	json_test := []byte(`
+	describeAmaroneReq := `
 	{
 	  "result": {
 	    "source": "agent",
@@ -91,17 +92,8 @@ func TestApi(t *testing.T) {
 	      "intentName": "wine.describe"
 	    }
 	  }
-	}`)
-
-	fmt.Println("Testing wine.describe(amarone)")
-	var testReq apiai.ActionRequest
-	err = json.Unmarshal(json_test, &testReq)
-	if err != nil {
-		t.Fatal("parse error:", err)
-	}
-	fmt.Println(testReq)
-
-	testResp := GetActionResponse(t, ts, &testReq)
+	}`
+	testResp := GetActionResponseFromJson(t, ts, describeAmaroneReq)
 	assert.NotNil(t, testResp)
 	assert.Equal(t, "amarone: Amarone description", testResp.Speech)
 	fmt.Println("winner!", testResp.Speech)
@@ -115,9 +107,52 @@ func TestApi(t *testing.T) {
 	LoadWinesFromJsonIntoDb("../../../wine-list.json")
 
 	// same request as before, but against a different wine list
-	testResp = GetActionResponse(t, ts, &testReq)
+	testResp = GetActionResponseFromJson(t, ts, describeAmaroneReq)
 	assert.NotNil(t, testResp)
-	fmt.Println("Winner!", testResp.Speech)
+
+
+	merlotQueryReq := `
+	{
+	  "result": {
+	    "parameters": {
+	      "wine-descriptor": "Stags Leap Merlot"
+	    },
+	    "metadata": {
+	      "intentName": "wine.query-availability"
+	    }
+	  }
+	}`
+	qResp := GetActionResponseFromJson(t, ts, merlotQueryReq)
+	if !strings.HasPrefix(qResp.Speech, "Yes") {
+		t.Fatal("Merlot should start out available")
+	}
+
+	GetActionResponseFromJson(t, ts, `
+	{
+		"result": {
+			"parameters": {
+				"wine-descriptor": "Stags Leap Merlot"
+			},
+			"metadata": {
+				"intentName": "wine.mark-unavailable"
+			}
+		}
+	}`)
+
+	qResp = GetActionResponseFromJson(t, ts, merlotQueryReq)
+	if !strings.HasPrefix(qResp.Speech, "No") {
+		t.Fatal("Merlot should be gone after marking it unavailable")
+	}
+}
+
+func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
+	var testReq apiai.ActionRequest
+	err := json.Unmarshal([]byte(jsonStr), &testReq)
+	if err != nil {
+		t.Fatal("parse error:", err)
+	}
+
+	return GetActionResponse(t, ts, &testReq)
 }
 
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
