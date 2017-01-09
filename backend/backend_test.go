@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
@@ -21,7 +20,7 @@ import (
 // the given functions and cleans up.
 // Allows each test to be executed in a clean server state.
 func WineContext(t *testing.T, f func(*testing.T, *httptest.Server)) {
-	fmt.Println("Initializing context")
+	t.Log("Initializing context")
 
 	err := InitConfigInfo("../cellar-config.json.example")
 	if err != nil {
@@ -100,20 +99,21 @@ func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionReque
 
 	body, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err)
+		t.Log(err)
 		return nil
 	}
 	var apiResp apiai.ActionResponse
 	err = json.Unmarshal(body, &apiResp)
 	if err != nil {
-		fmt.Println(err)
+		t.Log(err)
 		return nil
 	}
 
 	return &apiResp
 }
 
-func ForceAuthenticate(req *http.Request, email string) {
+func ForceAuthenticate(ts *httptest.Server, email string) {
+	req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
 	session, err := store.Get(req, "session-name")
 	if err != nil {
 		log.Fatal(err)
@@ -168,34 +168,43 @@ func TestBlockedWhenNotLoggedIn(t *testing.T) {
 	})
 }
 
-func TestApi(t *testing.T) {
+func TestEmptyResponse(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server) {
-		req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
-		ForceAuthenticate(req, "justbuchanan@gmail.com")
-		fmt.Println("Force-authenticated as justbuchanan@gmail.com")
+		actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
+		assert.Nil(t, actionResponse)
+	})
+}
+
+func TestAuthentication(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		ForceAuthenticate(ts, "justbuchanan@gmail.com")
+		t.Log("Force-authenticated as justbuchanan@gmail.com")
 		res, err := http.Get(ts.URL + "/api/wines")
 		if err != nil {
 			log.Fatal(err)
 		}
 		if res.StatusCode == http.StatusForbidden {
-			// t.Fatal("Api should be accessible after user is authenticated")
-			// TODO
+			t.Fatal("Api should be accessible after user is authenticated")
 		}
+	})
+}
 
-		fmt.Println("Trying empty action response")
-		actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
-		assert.Nil(t, actionResponse)
+func TestDescribeWine(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
 
-		RunTestWineDescriptorLookup(t)
-		fmt.Println("-- ran RunTestWineDescriptorLookup()")
+	})
+}
 
+func TestDescribeWines(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		LoadWinesFromJsonIntoDb("test-wines.json")
 		// request wine.describe(amarone)
 		testResp := GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
 		if testResp == nil {
 			t.Fatal("wine.describe(amarone) -> nil response")
 		}
 		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-		fmt.Println("winner!", testResp.Speech)
+		t.Log("winner!", testResp.Speech)
 
 		// clear db
 		ClearDb()
@@ -233,28 +242,30 @@ func TestMarkUnavailable(t *testing.T) {
 	})
 }
 
-func RunTestWineDescriptorLookup(t *testing.T) {
-	LoadWinesFromJsonIntoDb("test-wines.json")
-	fmt.Println("Loaded test wines into db")
+func TestWineDescriptorLookup(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		LoadWinesFromJsonIntoDb("test-wines.json")
+		t.Log("Loaded test wines into db")
 
-	// exact match
-	result := WineDescriptorLookup("chiraz")
-	if assert.NotNil(t, result) {
-		assert.Equal(t, "chiraz", result.Name)
-	}
+		// exact match
+		result := WineDescriptorLookup("chiraz")
+		if assert.NotNil(t, result) {
+			assert.Equal(t, "chiraz", result.Name)
+		}
 
-	// approximate match
-	result = WineDescriptorLookup("chardonay") // missing an "n"
-	if assert.NotNil(t, result) {
-		assert.Equal(t, "chardonnay", result.Name)
-	}
+		// approximate match
+		result = WineDescriptorLookup("chardonay") // missing an "n"
+		if assert.NotNil(t, result) {
+			assert.Equal(t, "chardonnay", result.Name)
+		}
 
-	result = WineDescriptorLookup("2013 amarone")
-	if assert.NotNil(t, result) {
-		assert.Equal(t, "2013 amarone", result.Name)
-	}
+		result = WineDescriptorLookup("2013 amarone")
+		if assert.NotNil(t, result) {
+			assert.Equal(t, "2013 amarone", result.Name)
+		}
 
-	// bad match
-	result = WineDescriptorLookup("bla bla bla")
-	assert.Nil(t, result)
+		// bad match
+		result = WineDescriptorLookup("bla bla bla")
+		assert.Nil(t, result)
+	})
 }

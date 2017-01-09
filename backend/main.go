@@ -90,10 +90,7 @@ func CreateHttpHandler() http.Handler {
 	// note: it must first be built with `ng build`
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
 
-	// log all requests
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-
-	return loggedRouter
+	return router
 }
 
 func ReadConfigFile(filename string) (cfgRet *ServerConfigInfo, err error) {
@@ -199,7 +196,8 @@ func main() {
 		}
 	}
 
-	loggedRouter := CreateHttpHandler()
+	// log all requests
+	loggedRouter := handlers.LoggingHandler(os.Stdout, CreateHttpHandler())
 	fmt.Println("Winesnob listening on port " + *port)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+*port, loggedRouter))
 }
