@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	// "github.com/gorilla/sessions"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -125,8 +124,6 @@ func ForceAuthenticate(req *http.Request, email string) {
 	session.Values["email"] = email
 	w := httptest.NewRecorder()
 	session.Save(req, w)
-
-	// fmt.Println(session)
 }
 
 func ClearDb() {
@@ -195,7 +192,9 @@ func TestApi(t *testing.T) {
 
 		// request wine.describe(amarone)
 		testResp := GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
-		assert.NotNil(t, testResp)
+		if testResp == nil {
+			t.Fatal("wine.describe(amarone) -> nil response")
+		}
 		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
 		fmt.Println("winner!", testResp.Speech)
 
@@ -217,6 +216,9 @@ func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server) {
 		// check that it's available
 		qResp := GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
+		if qResp == nil {
+			t.Fatal("nil response")
+		}
 		if !strings.HasPrefix(qResp.Speech, "Yes") {
 			t.Fatal("Merlot should start out available")
 		}
