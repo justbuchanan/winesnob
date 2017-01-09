@@ -1,20 +1,20 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/justbuchanan/winesnob/backend/apiai"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"testing"
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"github.com/justbuchanan/winesnob/backend/apiai"
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"strings"
+	"testing"
 )
 
 // configures, then initializes wine db with given file. Then executes each of
@@ -22,7 +22,7 @@ import (
 // Allows each test to be executed in a clean server state.
 func WineContext(t *testing.T, f func(*testing.T, *httptest.Server)) {
 	fmt.Println("Initializing context")
-	
+
 	err := InitConfigInfo("../cellar-config.json.example")
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +79,6 @@ const RequestDeleteStagsLeapMerlot = `
 			}
 		}
 	}`
-
 
 func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
 	var testReq apiai.ActionRequest
