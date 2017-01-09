@@ -8,6 +8,12 @@ import (
 	"net/http"
 )
 
+func WineNotFoundResponse() *apiai.ActionResponse {
+	return &apiai.ActionResponse{
+		Speech: "I'm sorry, I couldn't find a wine matching that description"
+	}
+}
+
 func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
 	var resp apiai.ActionResponse
 
@@ -37,7 +43,8 @@ func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 	if wine != nil {
 		speech = wine.Name + ": " + wine.Description
 	} else {
-		speech = "I'm sorry, I couldn't find a wine matching that description"
+		return WineNotFoundResponse()
+		// speech = "I'm sorry, I couldn't find a wine matching that description"
 	}
 
 	return &apiai.ActionResponse{
@@ -59,8 +66,32 @@ func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
 	return &apiai.ActionResponse{}
 }
 
+// func LookupWineDescriptorOrFail(descriptor string) *WineInfo {
+// 	wine := WineDescriptorLookup(wineDesc)
+// 	if wine == nil {
+
+// 	}
+	
+// }
+
 // TODO: actually implement this
 func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
+	// wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+	// wine := LookupWineDescriptorOrFail(wineDesc)
+	// if wine == nil {
+	// 	return
+	// }
+
+	// find closest match by descriptor
+	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
+
+	if wine != nil {
+		// TODO: mark this wine as available OR say that it's already available
+	} else {
+		// TODO: create new wine and say what happened
+		// TODO: how to know if it's red or not?
+	}
+
 	// TODO
 	return &apiai.ActionResponse{}
 }
@@ -85,8 +116,8 @@ func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		"wine.list":               Intent_Wine_List,
 		"wine.describe":           Intent_Wine_Describe,
 		"wine.pair":               Intent_Wine_Pair,
-		"wine.remove-inventory":   Intent_Wine_Remove,
-		"wine.add-inventory":      Intent_Wine_Add,
+		"wine.mark-unavailable":   Intent_Wine_Remove,
+		"wine.mark-available":      Intent_Wine_Add,
 		"wine.query-availability": Intent_Wine_Query,
 	}
 

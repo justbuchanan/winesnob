@@ -22,7 +22,6 @@
   * logout button is too big at top of page
   * "Cellar" text bumps into search bar
 * list wines that are in the registry, but not available
-* "You don't have any wines text" shows all the time
 
 
 -- v1 cutoff
