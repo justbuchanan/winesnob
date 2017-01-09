@@ -40,7 +40,7 @@ type GoogleOauth2Result struct {
 }
 
 // sends forbidden http response and returns false if the user isn't authenticated
-func EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
+func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
 		// TODO: handle error
@@ -57,7 +57,7 @@ func EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
+func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 	sess, err := store.Get(r, SESSION_NAME)
 	if err != nil {
 		log.Fatal(err)
@@ -74,7 +74,7 @@ func LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(js)
 }
 
-func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handleGoogleCallback")
 	state := r.FormValue("state")
 	if state != oauthStateString {
@@ -116,12 +116,12 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
+func (env *Env) handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

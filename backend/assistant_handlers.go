@@ -14,13 +14,13 @@ func WineNotFoundResponse() *apiai.ActionResponse {
 	}
 }
 
-func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
 	var resp apiai.ActionResponse
 
 	color := req.Result.Parameters["wine-type"]
 	var wineNames []string
 	var wines []WineInfo
-	db.Find(&wines)
+	env.db.Find(&wines)
 	for _, elem := range wines {
 		if (color == "" || (color == "red" == elem.Red)) && elem.Available {
 			wineNames = append(wineNames, elem.Name)
@@ -36,9 +36,9 @@ func Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
 	return &resp
 }
 
-func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
-	wine := WineDescriptorLookup(wineDesc)
+	wine := env.WineDescriptorLookup(wineDesc)
 
 	if wine == nil {
 		return WineNotFoundResponse()
@@ -50,16 +50,16 @@ func Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
 }
 
 // TODO: actually implement this
-func Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
 	food := req.Result.Parameters["food"].(string)
 	return &apiai.ActionResponse{
 		Speech: "I'd recommend the amarone, it goes very well with " + food,
 	}
 }
 
-func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
-	wine := WineDescriptorLookup(wineDesc)
+	wine := env.WineDescriptorLookup(wineDesc)
 
 	if wine == nil {
 		return WineNotFoundResponse()
@@ -73,7 +73,7 @@ func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
 
 	// mark unavailable
 	wine.Available = false
-	err := db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	err := env.db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
 	if err != nil {
 		return &apiai.ActionResponse{
 			Speech: "Error", // TODO
@@ -85,9 +85,9 @@ func Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
-func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
-	wine := WineDescriptorLookup(wineDesc)
+	wine := env.WineDescriptorLookup(wineDesc)
 
 	if wine == nil {
 		return WineNotFoundResponse()
@@ -101,7 +101,7 @@ func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
 
 	// mark as available
 	wine.Available = true
-	err := db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	err := env.db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
 	if err != nil {
 		return &apiai.ActionResponse{
 			Speech: "Error", // TODO
@@ -113,9 +113,9 @@ func Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
-func Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
-	wine := WineDescriptorLookup(wineDesc)
+	wine := env.WineDescriptorLookup(wineDesc)
 
 	if wine == nil {
 		return WineNotFoundResponse()
@@ -132,7 +132,7 @@ func Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
-func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
+func (env *Env) ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req apiai.ActionRequest
 	err := decoder.Decode(&req)
@@ -143,12 +143,12 @@ func ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	intentHandlers := map[string](func(apiai.ActionRequest) *apiai.ActionResponse){
-		"wine.list":               Intent_Wine_List,
-		"wine.describe":           Intent_Wine_Describe,
-		"wine.pair":               Intent_Wine_Pair,
-		"wine.mark-unavailable":   Intent_Wine_Remove,
-		"wine.mark-available":     Intent_Wine_Add,
-		"wine.query-availability": Intent_Wine_Query,
+		"wine.list":               env.Intent_Wine_List,
+		"wine.describe":           env.Intent_Wine_Describe,
+		"wine.pair":               env.Intent_Wine_Pair,
+		"wine.mark-unavailable":   env.Intent_Wine_Remove,
+		"wine.mark-available":     env.Intent_Wine_Add,
+		"wine.query-availability": env.Intent_Wine_Query,
 	}
 
 	intent := req.Result.Metadata.IntentName

@@ -42,8 +42,13 @@ type ServerConfigInfo struct {
 	ApiaiAuthPassword  string
 }
 
-var db *gorm.DB
 var store *sessions.CookieStore
+
+type Env struct {
+	db    *gorm.DB
+	store *sessions.CookieStore
+	// logger *log.logger
+}
 
 // these values are set via the server config file
 var (
@@ -51,7 +56,7 @@ var (
 	APIAI_AUTH_PASSWORD = "?"
 )
 
-func BasicAuthHandler(username string, password string, next http.HandlerFunc) http.Handler {
+func (env *Env) BasicAuthHandler(username string, password string, next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, _ := r.BasicAuth()
 		// if incorrect credentials, forbid access and return
@@ -65,26 +70,26 @@ func BasicAuthHandler(username string, password string, next http.HandlerFunc) h
 	})
 }
 
-func CreateHttpHandler() http.Handler {
+func (env *Env) CreateHttpHandler() http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// apiai webhook for "fulfillment"
 	router.Handle("/webhook",
-		BasicAuthHandler(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD,
-			ApiaiWebhookHandler)).Methods("POST")
+		env.BasicAuthHandler(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD,
+			env.ApiaiWebhookHandler)).Methods("POST")
 
 	// "api" routes
 	api := router.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/wine/{wineId}", WineHandler).Methods("GET")
-	api.HandleFunc("/wine/{wineId}", WineDeleteHandler).Methods("DELETE")
-	api.HandleFunc("/wines", WineCreateHandler).Methods("POST")
-	api.HandleFunc("/wines", WinesIndexHandler).Methods("GET")
-	api.HandleFunc("/wine/{wineId}", WineUpdateHandler).Methods("PUT")
+	api.HandleFunc("/wine/{wineId}", env.WineHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", env.WineDeleteHandler).Methods("DELETE")
+	api.HandleFunc("/wines", env.WineCreateHandler).Methods("POST")
+	api.HandleFunc("/wines", env.WinesIndexHandler).Methods("GET")
+	api.HandleFunc("/wine/{wineId}", env.WineUpdateHandler).Methods("PUT")
 
-	router.HandleFunc("/oauth2/login", handleGoogleLogin)
-	router.HandleFunc("/oauth2/logout", handleGoogleLogout)
-	router.HandleFunc("/oauth2/google-callback", handleGoogleCallback)
-	router.HandleFunc("/oauth2/login-status", LoginStatusHandler)
+	router.HandleFunc("/oauth2/login", env.handleGoogleLogin)
+	router.HandleFunc("/oauth2/logout", env.handleGoogleLogout)
+	router.HandleFunc("/oauth2/google-callback", env.handleGoogleCallback)
+	router.HandleFunc("/oauth2/login-status", env.LoginStatusHandler)
 
 	// serve angular frontend
 	// note: it must first be built with `ng build`
@@ -136,7 +141,7 @@ func InitConfigInfo(filename string) error {
 	return nil
 }
 
-func LoadSamplesIntoDb(filename string) error {
+func LoadSamplesIntoDb(db *gorm.DB, filename string) error {
 	wines, err := ReadWinesFromFile(filename)
 	if err != nil {
 		return err
@@ -144,7 +149,7 @@ func LoadSamplesIntoDb(filename string) error {
 
 	// insert into database
 	for _, wine := range wines {
-		wine.Id = GenerateUniqueId()
+		wine.Id = GenerateUniqueId(db)
 		err = db.Create(&wine).Error
 		if err != nil {
 			return err
@@ -177,6 +182,7 @@ func main() {
 
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
+	var db *gorm.DB
 	db, err = gorm.Open("sqlite3", *dbPath)
 	defer db.Close()
 	if err != nil {
@@ -189,15 +195,19 @@ func main() {
 	db.AutoMigrate(&WineInfo{})
 
 	if *loadSamples {
-		err = LoadSamplesIntoDb("wine-list.json")
+		err = LoadSamplesIntoDb(db, "wine-list.json")
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
 		}
 	}
 
+	env := &Env{}
+	env.db = db
+	env.store = store
+
 	// log all requests
-	loggedRouter := handlers.LoggingHandler(os.Stdout, CreateHttpHandler())
+	loggedRouter := handlers.LoggingHandler(os.Stdout, env.CreateHttpHandler())
 	fmt.Println("Winesnob listening on port " + *port)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+*port, loggedRouter))
 }
@@ -231,10 +241,10 @@ func ReadWinesFromFile(filename string) (wines []WineInfo, err error) {
 
 // does a fuzzy match against the all wine names and returns the top one if any
 // match decently.
-func WineDescriptorLookup(descriptor string) *WineInfo {
+func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 	descriptor = strings.ToLower(descriptor)
 	var wines []WineInfo
-	db.Find(&wines)
+	env.db.Find(&wines)
 
 	const debug = false
 
@@ -280,7 +290,7 @@ func GenerateRandomId() string {
 	return string(b)
 }
 
-func GenerateUniqueId() string {
+func GenerateUniqueId(db *gorm.DB) string {
 	for {
 		id := GenerateRandomId()
 		var count uint64

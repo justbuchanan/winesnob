@@ -9,15 +9,15 @@ import (
 	"net/http"
 )
 
-func WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !EnsureLoggedIn(w, r) {
+func (env *Env) WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !env.EnsureLoggedIn(w, r) {
 		return
 	}
 
 	vars := mux.Vars(r)
 	wineId := vars["wineId"]
 
-	err := db.Delete(&WineInfo{Id: wineId}).Error
+	err := env.db.Delete(&WineInfo{Id: wineId}).Error
 	if err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -27,8 +27,8 @@ func WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: set deleted status code
 }
 
-func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !EnsureLoggedIn(w, r) {
+func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !env.EnsureLoggedIn(w, r) {
 		return
 	}
 
@@ -42,10 +42,10 @@ func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// assign a unique id
-	wine.Id = GenerateUniqueId()
+	wine.Id = GenerateUniqueId(env.db)
 
 	// try to create a new wine in the db
-	err = db.Create(&wine).Error
+	err = env.db.Create(&wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
@@ -56,8 +56,8 @@ func WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wine)
 }
 
-func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !EnsureLoggedIn(w, r) {
+func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !env.EnsureLoggedIn(w, r) {
 		return
 	}
 
@@ -74,7 +74,7 @@ func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wine.Id = "" // clear wine id so it doesn't get set by the update
-	err = db.Model(&wine).Where("id = ?", wineId).Updates(wine).Error
+	err = env.db.Model(&wine).Where("id = ?", wineId).Updates(wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
@@ -84,8 +84,8 @@ func WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wine)
 }
 
-func WineHandler(w http.ResponseWriter, r *http.Request) {
-	if !EnsureLoggedIn(w, r) {
+func (env *Env) WineHandler(w http.ResponseWriter, r *http.Request) {
+	if !env.EnsureLoggedIn(w, r) {
 		return
 	}
 
@@ -93,7 +93,7 @@ func WineHandler(w http.ResponseWriter, r *http.Request) {
 	wineId := vars["wineId"]
 
 	var wine WineInfo
-	err := db.Where(&WineInfo{Id: wineId}).First(&wine).Error
+	err := env.db.Where(&WineInfo{Id: wineId}).First(&wine).Error
 
 	// 404 if no wine exists with that id
 	if err == gorm.ErrRecordNotFound {
@@ -105,15 +105,15 @@ func WineHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(wine)
 }
 
-func WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !EnsureLoggedIn(w, r) {
+func (env *Env) WinesIndexHandler(w http.ResponseWriter, r *http.Request) {
+	if !env.EnsureLoggedIn(w, r) {
 		return
 	}
 
 	// TODO: separate wine lists
 
 	var wines []WineInfo
-	db.Find(&wines)
+	env.db.Find(&wines)
 
 	json.NewEncoder(w).Encode(wines)
 }
