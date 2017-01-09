@@ -1,10 +1,7 @@
 package main
 
 import (
-	"github.com/justbuchanan/winesnob/backend/apiai"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"net/http"
 	"net/http/httptest"
 	"testing"
 	"strings"
@@ -48,55 +45,6 @@ const RequestDeleteStagsLeapMerlot = `
 		}
 	}`
 
-
-func TestJoinWordSeries(t *testing.T) {
-	items := []string{"red", "blue", "green"}
-	result := JoinWordSeries(items)
-	expected := "red, blue, and green"
-	if result != expected {
-		t.Error("result != expected")
-	}
-}
-
-func TestBlockedWhenNotLoggedIn(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server) {
-		// test authentication required
-		res, err := http.Get(ts.URL + "/api/wines")
-		if err != nil {
-			log.Fatal(err)
-		}
-		if res.StatusCode != http.StatusForbidden {
-			t.Fatal("Api should be blocked when not authenticated")
-		}
-	})
-}
-
-func TestEmptyResponse(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server) {
-		actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
-		assert.Nil(t, actionResponse)
-	})
-}
-
-func TestAuthentication(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server) {
-		ForceAuthenticate(ts, "justbuchanan@gmail.com")
-		t.Log("Force-authenticated as justbuchanan@gmail.com")
-		res, err := http.Get(ts.URL + "/api/wines")
-		if err != nil {
-			log.Fatal(err)
-		}
-		if res.StatusCode == http.StatusForbidden {
-			t.Fatal("Api should be accessible after user is authenticated")
-		}
-	})
-}
-
-func TestDescribeWine(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server) {
-
-	})
-}
 
 func TestDescribeWines(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server) {
