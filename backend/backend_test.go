@@ -18,19 +18,13 @@ import (
 	"strings"
 )
 
-func TestJoinWordSeries(t *testing.T) {
-	items := []string{"red", "blue", "green"}
-	result := JoinWordSeries(items)
-	expected := "red, blue, and green"
-	if result != expected {
-		t.Error("result != expected")
-	}
-}
-
-func TestApi(t *testing.T) {
-	var err error
-
-	err = InitConfigInfo("../cellar-config.json.example")
+// configures, then initializes wine db with given file. Then executes each of
+// the given functions and cleans up.
+// Allows each test to be executed in a clean server state.
+func WineContext(t *testing.T, f func(*testing.T, *httptest.Server)) {
+	fmt.Println("Initializing context")
+	
+	err := InitConfigInfo("../cellar-config.json.example")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,40 +40,11 @@ func TestApi(t *testing.T) {
 	ts := httptest.NewServer(CreateHttpHandler())
 	defer ts.Close()
 
-	var res *http.Response
+	// run function
+	f(t, ts)
+}
 
-	// test authentication required
-	res, err = http.Get(ts.URL + "/api/wines")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if res.StatusCode != http.StatusForbidden {
-		t.Fatal("Api should be blocked when not authenticated")
-	}
-
-	req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
-	ForceAuthenticate(req, "justbuchanan@gmail.com")
-	fmt.Println("Force-authenticated as justbuchanan@gmail.com")
-
-	res, err = http.Get(ts.URL + "/api/wines")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// fmt.Println(store)
-	if res.StatusCode == http.StatusForbidden {
-		// t.Fatal("Api should be accessible after user is authenticated")
-		// TODO
-	}
-
-	fmt.Println("Trying empty action response")
-	actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
-	assert.Nil(t, actionResponse)
-
-	RunTestWineDescriptorLookup(t)
-	fmt.Println("-- ran RunTestWineDescriptorLookup()")
-
-	// request wine.describe(amarone)
-	describeAmaroneReq := `
+const RequestDescribeAmarone = `
 	{
 	  "result": {
 	    "source": "agent",
@@ -93,25 +58,7 @@ func TestApi(t *testing.T) {
 	    }
 	  }
 	}`
-	testResp := GetActionResponseFromJson(t, ts, describeAmaroneReq)
-	assert.NotNil(t, testResp)
-	assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-	fmt.Println("winner!", testResp.Speech)
-
-	// clear db
-	ClearDb()
-	var count uint64
-	db.Model(&WineInfo{}).Count(&count)
-	assert.Equal(t, 0, count)
-
-	LoadWinesFromJsonIntoDb("../../../wine-list.json")
-
-	// same request as before, but against a different wine list
-	testResp = GetActionResponseFromJson(t, ts, describeAmaroneReq)
-	assert.NotNil(t, testResp)
-
-
-	merlotQueryReq := `
+const RequestAvailabilityStagsLeapMerlot = `
 	{
 	  "result": {
 	    "parameters": {
@@ -122,12 +69,7 @@ func TestApi(t *testing.T) {
 	    }
 	  }
 	}`
-	qResp := GetActionResponseFromJson(t, ts, merlotQueryReq)
-	if !strings.HasPrefix(qResp.Speech, "Yes") {
-		t.Fatal("Merlot should start out available")
-	}
-
-	GetActionResponseFromJson(t, ts, `
+const RequestDeleteStagsLeapMerlot = `
 	{
 		"result": {
 			"parameters": {
@@ -137,13 +79,8 @@ func TestApi(t *testing.T) {
 				"intentName": "wine.mark-unavailable"
 			}
 		}
-	}`)
+	}`
 
-	qResp = GetActionResponseFromJson(t, ts, merlotQueryReq)
-	if !strings.HasPrefix(qResp.Speech, "No") {
-		t.Fatal("Merlot should be gone after marking it unavailable")
-	}
-}
 
 func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
 	var testReq apiai.ActionRequest
@@ -211,6 +148,88 @@ func LoadWinesFromJsonIntoDb(filename string) {
 			os.Exit(1)
 		}
 	}
+}
+
+func TestJoinWordSeries(t *testing.T) {
+	items := []string{"red", "blue", "green"}
+	result := JoinWordSeries(items)
+	expected := "red, blue, and green"
+	if result != expected {
+		t.Error("result != expected")
+	}
+}
+
+func TestBlockedWhenNotLoggedIn(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		// test authentication required
+		res, err := http.Get(ts.URL + "/api/wines")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if res.StatusCode != http.StatusForbidden {
+			t.Fatal("Api should be blocked when not authenticated")
+		}
+	})
+}
+
+func TestApi(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
+		ForceAuthenticate(req, "justbuchanan@gmail.com")
+		fmt.Println("Force-authenticated as justbuchanan@gmail.com")
+		res, err := http.Get(ts.URL + "/api/wines")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if res.StatusCode == http.StatusForbidden {
+			// t.Fatal("Api should be accessible after user is authenticated")
+			// TODO
+		}
+
+		fmt.Println("Trying empty action response")
+		actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
+		assert.Nil(t, actionResponse)
+
+		RunTestWineDescriptorLookup(t)
+		fmt.Println("-- ran RunTestWineDescriptorLookup()")
+
+		// request wine.describe(amarone)
+		testResp := GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
+		assert.NotNil(t, testResp)
+		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
+		fmt.Println("winner!", testResp.Speech)
+
+		// clear db
+		ClearDb()
+		var count uint64
+		db.Model(&WineInfo{}).Count(&count)
+		assert.Equal(t, 0, count)
+
+		LoadWinesFromJsonIntoDb("../../../wine-list.json")
+
+		// same request as before, but against a different wine list
+		testResp = GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
+		assert.NotNil(t, testResp)
+	})
+}
+
+func TestMarkUnavailable(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server) {
+		// check that it's available
+		qResp := GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
+		if !strings.HasPrefix(qResp.Speech, "Yes") {
+			t.Fatal("Merlot should start out available")
+		}
+
+		// delete it
+		GetActionResponseFromJson(t, ts, RequestDeleteStagsLeapMerlot)
+
+		// ensure that it's not available
+		qResp = GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
+		if !strings.HasPrefix(qResp.Speech, "No") {
+			t.Fatal("Merlot should be gone after marking it unavailable")
+		}
+	})
 }
 
 func RunTestWineDescriptorLookup(t *testing.T) {
