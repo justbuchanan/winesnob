@@ -86,7 +86,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		fmt.Println("Code exchange failed with '%s'\n", err)
+		fmt.Println("Code exchange failed with:", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}

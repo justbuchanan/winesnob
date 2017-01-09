@@ -55,18 +55,31 @@ func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string
 }
 
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
+	// build POST request with apiai request
 	jsonValue, _ := json.Marshal(req)
-	res, err := http.Post(ts.URL+"/webhook", "application/json", bytes.NewBuffer(jsonValue))
+	httpReq, err := http.NewRequest("POST", ts.URL + "/webhook", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		t.Fatal(err)
+		return nil
+	}
+	// use basic auth to authenticate
+	httpReq.SetBasicAuth(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD)
+
+	// do it!
+	var res *http.Response
+	res, err = http.DefaultClient.Do(httpReq)
 	if err != nil {
 		t.Fatal(err)
 		return nil
 	}
 
+	// parse response body json
 	body, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
 		t.Log(err)
 		return nil
 	}
+	t.Log("body: ", string(body))
 	var apiResp apiai.ActionResponse
 	err = json.Unmarshal(body, &apiResp)
 	if err != nil {

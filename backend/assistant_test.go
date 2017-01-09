@@ -53,15 +53,15 @@ func TestDescribeWines(t *testing.T) {
 			t.Fatal("wine.describe(amarone) -> nil response")
 		}
 		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-		t.Log("winner!", testResp.Speech)
+		t.Log("Response:", testResp.Speech)
 
 		// clear db
 		env.ClearDb()
 		var count uint64
 		env.db.Model(&WineInfo{}).Count(&count)
-		assert.Equal(t, 0, count)
+		assert.Equal(t, 0, int(count))
 
-		env.LoadWinesFromJsonIntoDb("../../../wine-list.json")
+		env.LoadWinesFromJsonIntoDb("../wine-list.json")
 
 		// same request as before, but against a different wine list
 		testResp = GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
@@ -71,6 +71,7 @@ func TestDescribeWines(t *testing.T) {
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+        env.LoadWinesFromJsonIntoDb("../wine-list.json")
 		// check that it's available
 		qResp := GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if qResp == nil {

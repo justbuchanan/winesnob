@@ -75,10 +75,12 @@ func (env *Env) Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionRespons
 	wine.Available = false
 	err := env.db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
 	if err != nil {
+		log.Fatal(err)
 		return &apiai.ActionResponse{
 			Speech: "Error", // TODO
 		}
 	}
+	// log.Fatal("available?", wine.Available) // TODO
 
 	return &apiai.ActionResponse{
 		Speech: "Noted, there's no more " + wine.Name + " left",

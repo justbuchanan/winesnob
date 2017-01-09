@@ -1,0 +1,32 @@
+machine:
+  environment:
+    GOPATH: $HOME/.go_project
+    PATH: $PATH:$HOME/.go_workspace/bin
+    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+
+dependencies:
+  override:
+    - go get -t -d -v ./...
+    # - cd backend && go build -v .
+    - go get -u github.com/golang/lint/golint
+    - go get -u github.com/mattn/goveralls
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+  cache_directories:
+    - $GOPATH
+
+test:
+  pre:
+    - go vet ./...
+
+    # golint output should be blank - ignore messages about commenting everything...
+    - golint ./... | grep -v "should have comment" > $CIRCLE_ARTIFACTS/lint-report.txt
+
+  override:
+    - cd $GOPATH/src/$IMPORT_PATH/backend; go test -coverprofile=$CIRCLE_ARTIFACTS/coverage.txt .
+
+    # coverage html report
+    - cd $GOPATH/src/$IMPORT_PATH/backend; go tool cover -html=$CIRCLE_ARTIFACTS/coverage.txt -o $CIRCLE_ARTIFACTS/coverage.html
+
+    # upload coverage
+    - cd $GOPATH/src/$IMPORT_PATH/backend; goveralls -coverprofile=$CIRCLE_ARTIFACTS/coverage.txt -service=circle-ci -repotoken=$COVERALLS_TOKEN
