@@ -37,14 +37,14 @@ func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	}
 
 	// run http server
-	ts := httptest.NewServer(env.CreateHttpHandler())
+	ts := httptest.NewServer(env.CreateHTTPHandler())
 	defer ts.Close()
 
 	// run function
 	f(t, ts, env)
 }
 
-func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
+func GetActionResponseFromJSON(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
 	var testReq apiai.ActionRequest
 	err := json.Unmarshal([]byte(jsonStr), &testReq)
 	if err != nil {
@@ -107,7 +107,7 @@ func (env *Env) ClearDb() {
 	env.db.Where("").Delete(&WineInfo{})
 }
 
-func (env *Env) LoadWinesFromJsonIntoDb(filename string) {
+func (env *Env) LoadWinesFromJSONIntoDb(filename string) {
 	wines, err := ReadWinesFromFile(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -115,7 +115,7 @@ func (env *Env) LoadWinesFromJsonIntoDb(filename string) {
 
 	// insert into database
 	for _, wine := range wines {
-		wine.Id = GenerateUniqueId(env.db)
+		wine.ID = GenerateUniqueID(env.db)
 		err = env.db.Create(&wine).Error
 		if err != nil {
 			log.Fatal(err)

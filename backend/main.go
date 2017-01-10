@@ -29,7 +29,7 @@ type WineInfo struct {
 	Red         bool   `json:"red"`
 	Available   bool   `json:"available"`
 
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
 
 // see cellar-config.json.example for info
@@ -70,7 +70,7 @@ func (env *Env) BasicAuthHandler(username string, password string, next http.Han
 	})
 }
 
-func (env *Env) CreateHttpHandler() http.Handler {
+func (env *Env) CreateHTTPHandler() http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// apiai webhook for "fulfillment"
@@ -149,7 +149,7 @@ func LoadSamplesIntoDb(db *gorm.DB, filename string) error {
 
 	// insert into database
 	for _, wine := range wines {
-		wine.Id = GenerateUniqueId(db)
+		wine.ID = GenerateUniqueID(db)
 		err = db.Create(&wine).Error
 		if err != nil {
 			return err
@@ -207,7 +207,7 @@ func main() {
 	env.store = store
 
 	// log all requests
-	loggedRouter := handlers.LoggingHandler(os.Stdout, env.CreateHttpHandler())
+	loggedRouter := handlers.LoggingHandler(os.Stdout, env.CreateHTTPHandler())
 	fmt.Println("Winesnob listening on port " + *port)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+*port, loggedRouter))
 }
@@ -280,7 +280,7 @@ func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 
 // Random generation borrowed from here:
 // http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-func GenerateRandomId() string {
+func GenerateRandomID() string {
 	const length = 4
 	const letters = "abcdef0123456789"
 	b := make([]byte, length)
@@ -290,9 +290,9 @@ func GenerateRandomId() string {
 	return string(b)
 }
 
-func GenerateUniqueId(db *gorm.DB) string {
+func GenerateUniqueID(db *gorm.DB) string {
 	for {
-		id := GenerateRandomId()
+		id := GenerateRandomID()
 		var count uint64
 		err := db.Model(&WineInfo{}).Where("id = ?", id).Count(&count).Error
 		if err != nil {

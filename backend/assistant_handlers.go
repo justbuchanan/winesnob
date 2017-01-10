@@ -73,7 +73,7 @@ func (env *Env) IntentWineRemove(req apiai.ActionRequest) *apiai.ActionResponse 
 
 	// mark unavailable
 	wine.Available = false
-	err := env.db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	err := env.db.Model(&wine).Where("id = ?", wine.ID).Updates(wine).Error
 	if err != nil {
 		log.Fatal(err)
 		return &apiai.ActionResponse{
@@ -103,7 +103,7 @@ func (env *Env) IntentWineAdd(req apiai.ActionRequest) *apiai.ActionResponse {
 
 	// mark as available
 	wine.Available = true
-	err := env.db.Model(&wine).Where("id = ?", wine.Id).Updates(wine).Error
+	err := env.db.Model(&wine).Where("id = ?", wine.ID).Updates(wine).Error
 	if err != nil {
 		return &apiai.ActionResponse{
 			Speech: "Error", // TODO

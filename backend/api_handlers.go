@@ -17,7 +17,7 @@ func (env *Env) WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	wineID := vars["wineId"]
 
-	err := env.db.Delete(&WineInfo{Id: wineID}).Error
+	err := env.db.Delete(&WineInfo{ID: wineID}).Error
 	if err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -42,7 +42,7 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// assign a unique id
-	wine.Id = GenerateUniqueId(env.db)
+	wine.ID = GenerateUniqueID(env.db)
 
 	// try to create a new wine in the db
 	err = env.db.Create(&wine).Error
@@ -73,7 +73,7 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wine.Id = "" // clear wine id so it doesn't get set by the update
+	wine.ID = "" // clear wine id so it doesn't get set by the update
 	err = env.db.Model(&wine).Where("id = ?", wineID).Updates(wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -93,7 +93,7 @@ func (env *Env) WineHandler(w http.ResponseWriter, r *http.Request) {
 	wineID := vars["wineId"]
 
 	var wine WineInfo
-	err := env.db.Where(&WineInfo{Id: wineID}).First(&wine).Error
+	err := env.db.Where(&WineInfo{ID: wineID}).First(&wine).Error
 
 	// 404 if no wine exists with that id
 	if err == gorm.ErrRecordNotFound {

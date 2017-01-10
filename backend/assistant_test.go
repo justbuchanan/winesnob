@@ -46,9 +46,9 @@ const RequestDeleteStagsLeapMerlot = `
 
 func TestDescribeWines(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJsonIntoDb("test-wines.json")
+		env.LoadWinesFromJSONIntoDb("test-wines.json")
 		// request wine.describe(amarone)
-		testResp := GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
+		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		if testResp == nil {
 			t.Fatal("wine.describe(amarone) -> nil response")
 		}
@@ -61,19 +61,19 @@ func TestDescribeWines(t *testing.T) {
 		env.db.Model(&WineInfo{}).Count(&count)
 		assert.Equal(t, 0, int(count))
 
-		env.LoadWinesFromJsonIntoDb("../wine-list.json")
+		env.LoadWinesFromJSONIntoDb("../wine-list.json")
 
 		// same request as before, but against a different wine list
-		testResp = GetActionResponseFromJson(t, ts, RequestDescribeAmarone)
+		testResp = GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		assert.NotNil(t, testResp)
 	})
 }
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJsonIntoDb("../wine-list.json")
+		env.LoadWinesFromJSONIntoDb("../wine-list.json")
 		// check that it's available
-		qResp := GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
+		qResp := GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if qResp == nil {
 			t.Fatal("nil response")
 		}
@@ -82,10 +82,10 @@ func TestMarkUnavailable(t *testing.T) {
 		}
 
 		// delete it
-		GetActionResponseFromJson(t, ts, RequestDeleteStagsLeapMerlot)
+		GetActionResponseFromJSON(t, ts, RequestDeleteStagsLeapMerlot)
 
 		// ensure that it's not available
-		qResp = GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
+		qResp = GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if !strings.HasPrefix(qResp.Speech, "No") {
 			t.Fatal("Merlot should be gone after marking it unavailable")
 		}
@@ -94,7 +94,7 @@ func TestMarkUnavailable(t *testing.T) {
 
 func TestWineDescriptorLookup(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJsonIntoDb("test-wines.json")
+		env.LoadWinesFromJSONIntoDb("test-wines.json")
 		t.Log("Loaded test wines into db")
 
 		// exact match
