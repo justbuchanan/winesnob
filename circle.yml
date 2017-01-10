@@ -21,6 +21,9 @@ test:
     # golint output should be blank - ignore messages about commenting everything...
     - golint ./... | grep -v "should have comment" > $CIRCLE_ARTIFACTS/lint-report.txt
 
+    # fail if file is non-empty
+    - ! test -s $CIRCLE_ARTIFACTS/lint-report.txt
+
   override:
     - cd $GOPATH/src/$IMPORT_PATH/backend; go test -coverprofile=$CIRCLE_ARTIFACTS/coverage.txt .
 
