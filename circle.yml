@@ -1,13 +1,12 @@
 machine:
   environment:
     GOPATH: $HOME/.go_project
-    PATH: $PATH:$HOME/.go_workspace/bin
+    PATH: $PATH:$GOPATH/bin
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
 
 dependencies:
   override:
     - go get -t -d -v ./...
-    # - cd backend && go build -v .
     - go get -u github.com/golang/lint/golint
     - go get -u github.com/mattn/goveralls
     - mkdir -p "$GOPATH/src/$IMPORT_PATH"
