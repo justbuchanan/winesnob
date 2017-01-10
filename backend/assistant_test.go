@@ -71,7 +71,7 @@ func TestDescribeWines(t *testing.T) {
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-        env.LoadWinesFromJsonIntoDb("../wine-list.json")
+		env.LoadWinesFromJsonIntoDb("../wine-list.json")
 		// check that it's available
 		qResp := GetActionResponseFromJson(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if qResp == nil {

@@ -14,7 +14,7 @@ func WineNotFoundResponse() *apiai.ActionResponse {
 	}
 }
 
-func (env *Env) Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWineList(req apiai.ActionRequest) *apiai.ActionResponse {
 	var resp apiai.ActionResponse
 
 	color := req.Result.Parameters["wine-type"]
@@ -36,7 +36,7 @@ func (env *Env) Intent_Wine_List(req apiai.ActionRequest) *apiai.ActionResponse 
 	return &resp
 }
 
-func (env *Env) Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWineDescribe(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 	wine := env.WineDescriptorLookup(wineDesc)
 
@@ -49,15 +49,15 @@ func (env *Env) Intent_Wine_Describe(req apiai.ActionRequest) *apiai.ActionRespo
 	}
 }
 
-// TODO: actually implement this
-func (env *Env) Intent_Wine_Pair(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWinePair(req apiai.ActionRequest) *apiai.ActionResponse {
+	// TODO: actually implement this
 	food := req.Result.Parameters["food"].(string)
 	return &apiai.ActionResponse{
 		Speech: "I'd recommend the amarone, it goes very well with " + food,
 	}
 }
 
-func (env *Env) Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWineRemove(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 	wine := env.WineDescriptorLookup(wineDesc)
 
@@ -87,7 +87,7 @@ func (env *Env) Intent_Wine_Remove(req apiai.ActionRequest) *apiai.ActionRespons
 	}
 }
 
-func (env *Env) Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWineAdd(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 	wine := env.WineDescriptorLookup(wineDesc)
 
@@ -115,7 +115,7 @@ func (env *Env) Intent_Wine_Add(req apiai.ActionRequest) *apiai.ActionResponse {
 	}
 }
 
-func (env *Env) Intent_Wine_Query(req apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) IntentWineQuery(req apiai.ActionRequest) *apiai.ActionResponse {
 	wineDesc := req.Result.Parameters["wine-descriptor"].(string)
 	wine := env.WineDescriptorLookup(wineDesc)
 
@@ -145,12 +145,12 @@ func (env *Env) ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	intentHandlers := map[string](func(apiai.ActionRequest) *apiai.ActionResponse){
-		"wine.list":               env.Intent_Wine_List,
-		"wine.describe":           env.Intent_Wine_Describe,
-		"wine.pair":               env.Intent_Wine_Pair,
-		"wine.mark-unavailable":   env.Intent_Wine_Remove,
-		"wine.mark-available":     env.Intent_Wine_Add,
-		"wine.query-availability": env.Intent_Wine_Query,
+		"wine.list":               env.IntentWineList,
+		"wine.describe":           env.IntentWineDescribe,
+		"wine.pair":               env.IntentWinePair,
+		"wine.mark-unavailable":   env.IntentWineRemove,
+		"wine.mark-available":     env.IntentWineAdd,
+		"wine.query-availability": env.IntentWineQuery,
 	}
 
 	intent := req.Result.Metadata.IntentName

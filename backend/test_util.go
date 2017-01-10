@@ -57,7 +57,7 @@ func GetActionResponseFromJson(t *testing.T, ts *httptest.Server, jsonStr string
 func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
 	// build POST request with apiai request
 	jsonValue, _ := json.Marshal(req)
-	httpReq, err := http.NewRequest("POST", ts.URL + "/webhook", bytes.NewBuffer(jsonValue))
+	httpReq, err := http.NewRequest("POST", ts.URL+"/webhook", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		t.Fatal(err)
 		return nil

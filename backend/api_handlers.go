@@ -15,9 +15,9 @@ func (env *Env) WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	wineId := vars["wineId"]
+	wineID := vars["wineId"]
 
-	err := env.db.Delete(&WineInfo{Id: wineId}).Error
+	err := env.db.Delete(&WineInfo{Id: wineID}).Error
 	if err != nil {
 		log.Fatal(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -62,7 +62,7 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	wineId := vars["wineId"]
+	wineID := vars["wineId"]
 
 	decoder := json.NewDecoder(r.Body)
 	var wine WineInfo
@@ -74,7 +74,7 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wine.Id = "" // clear wine id so it doesn't get set by the update
-	err = env.db.Model(&wine).Where("id = ?", wineId).Updates(wine).Error
+	err = env.db.Model(&wine).Where("id = ?", wineID).Updates(wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
@@ -90,15 +90,15 @@ func (env *Env) WineHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	wineId := vars["wineId"]
+	wineID := vars["wineId"]
 
 	var wine WineInfo
-	err := env.db.Where(&WineInfo{Id: wineId}).First(&wine).Error
+	err := env.db.Where(&WineInfo{Id: wineID}).First(&wine).Error
 
 	// 404 if no wine exists with that id
 	if err == gorm.ErrRecordNotFound {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "No wine found for id %q\n", wineId)
+		fmt.Fprintf(w, "No wine found for id %q\n", wineID)
 		return
 	}
 
