@@ -45,8 +45,9 @@ type ServerConfigInfo struct {
 var store *sessions.CookieStore
 
 type Env struct {
-	db    *gorm.DB
-	store *sessions.CookieStore
+	db                       *gorm.DB
+	store                    *sessions.CookieStore
+	authenticate_everyone_as string // only use for testing
 	// logger *log.logger
 }
 

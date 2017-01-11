@@ -41,11 +41,14 @@ type GoogleOauth2Result struct {
 
 // sends forbidden http response and returns false if the user isn't authenticated
 func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
+	// fake auth - only for testing
+	if env.authenticate_everyone_as != "" {
+		return true
+	}
+
 	session, err := store.Get(r, SESSION_NAME)
 	if err != nil {
-		// TODO: handle error
 		log.Fatal(err)
-		return false
 	}
 
 	email := session.Values["email"]

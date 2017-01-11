@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
@@ -33,7 +34,8 @@ func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	db.AutoMigrate(&WineInfo{})
 
 	env := &Env{
-		db: db,
+		db:    db,
+		store: sessions.NewCookieStore([]byte("wahphuR0eethoo8R")),
 	}
 
 	// run http server
@@ -88,19 +90,6 @@ func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionReque
 	}
 
 	return &apiResp
-}
-
-func ForceAuthenticate(ts *httptest.Server, email string) {
-	req, _ := http.NewRequest("GET", ts.URL+"/api/wines", nil)
-	session, err := store.Get(req, "session-name")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	session.Values["email"] = email
-	w := httptest.NewRecorder()
-	session.Save(req, w)
 }
 
 func (env *Env) ClearDb() {

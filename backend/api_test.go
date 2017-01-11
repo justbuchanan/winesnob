@@ -36,11 +36,16 @@ func TestEmptyResponse(t *testing.T) {
 
 func TestFakeAuthentication(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		ForceAuthenticate(ts, "justbuchanan@gmail.com")
-		t.Log("Force-authenticated as justbuchanan@gmail.com")
-		res, err := http.Get(ts.URL + "/api/wines")
+		req, err := http.NewRequest("GET", ts.URL+"/api/wines", nil)
 		if err != nil {
-			t.Log(err)
+			t.Fatal(err)
+		}
+		env.authenticate_everyone_as = "justbuchanan@gmail.com" // fake auth
+
+		var res *http.Response
+		res, err = http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
 		}
 		if res.StatusCode == http.StatusForbidden {
 			t.Fatal("Api should be accessible after user is authenticated")

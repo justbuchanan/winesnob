@@ -45,23 +45,22 @@ func TestDescribeAmarone1(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.LoadWinesFromJSONIntoDb("test-wines.json")
 		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-        if assert.NotNil(t, testResp) {
-            assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-            t.Log("Response:", testResp.Speech)
-        }
+		if assert.NotNil(t, testResp) {
+			assert.Equal(t, "amarone: Amarone description", testResp.Speech)
+			t.Log("Response:", testResp.Speech)
+		}
 	})
 }
 
 // same as above, but against a different wine list
 func TestDescribeAmarone2(t *testing.T) {
-    WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-        env.LoadWinesFromJSONIntoDb("../wine-list.json")
-        testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-        assert.NotNil(t, testResp)
-        t.Log("Response:", testResp)
-    })
+	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+		env.LoadWinesFromJSONIntoDb("../wine-list.json")
+		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+		assert.NotNil(t, testResp)
+		t.Log("Response:", testResp)
+	})
 }
-
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {

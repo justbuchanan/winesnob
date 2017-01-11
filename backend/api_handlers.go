@@ -64,6 +64,8 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	wineID := vars["wineId"]
 
+	// TODO: ensure wineID already exists?
+
 	decoder := json.NewDecoder(r.Body)
 	var wine WineInfo
 	err := decoder.Decode(&wine)
@@ -73,8 +75,9 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wine.ID = "" // clear wine id so it doesn't get set by the update
-	err = env.db.Model(&wine).Where("id = ?", wineID).Updates(wine).Error
+	wine.ID = wineID
+
+	err = env.db.Save(wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, string(err.Error()))
