@@ -24,7 +24,6 @@ func (env *Env) WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(err.Error()))
 		return
 	}
-	// TODO: set deleted status code
 }
 
 func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +36,7 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&wine)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "Invalid json")
+		fmt.Fprintf(w, `{"error": "Invalid json"`)
 		return
 	}
 
@@ -48,7 +47,7 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err = env.db.Create(&wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, string(err.Error()))
+		fmt.Fprintf(w, `{"error": "` + string(err.Error()) + `"}`)
 		return
 	}
 
