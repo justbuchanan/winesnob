@@ -45,7 +45,7 @@ const RequestDeleteStagsLeapMerlot = `
 func TestDescribeAmarone1(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.LoadWinesFromJSONIntoDb("test-wines.json")
-		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		if assert.NotNil(t, testResp) {
 			assert.Equal(t, "amarone: Amarone description", testResp.Speech)
 			t.Log("Response:", testResp.Speech)
@@ -57,7 +57,7 @@ func TestDescribeAmarone1(t *testing.T) {
 func TestDescribeAmarone2(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.LoadWinesFromJSONIntoDb("../wine-list.json")
-		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		assert.NotNil(t, testResp)
 		t.Log("Response:", testResp)
 	})
@@ -67,7 +67,7 @@ func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.LoadWinesFromJSONIntoDb("../wine-list.json")
 		// check that it's available
-		qResp := GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
+		qResp := env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if qResp == nil {
 			t.Fatal("nil response")
 		}
@@ -76,10 +76,10 @@ func TestMarkUnavailable(t *testing.T) {
 		}
 
 		// delete it
-		GetActionResponseFromJSON(t, ts, RequestDeleteStagsLeapMerlot)
+		env.GetActionResponseFromJSON(t, ts, RequestDeleteStagsLeapMerlot)
 
 		// ensure that it's not available
-		qResp = GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
+		qResp = env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if !strings.HasPrefix(qResp.Speech, "No") {
 			t.Fatal("Merlot should be gone after marking it unavailable")
 		}

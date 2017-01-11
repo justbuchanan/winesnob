@@ -42,26 +42,24 @@ type ServerConfigInfo struct {
 	ApiaiAuthPassword  string
 }
 
-var store *sessions.CookieStore
-
-type Env struct {
-	db                       *gorm.DB
-	store                    *sessions.CookieStore
-	authenticate_everyone_as string // only use for testing
-	// logger *log.logger
+type BasicAuthCreds struct {
+	Username, Password string
 }
 
-// these values are set via the server config file
-var (
-	APIAI_AUTH_USERNAME = "apiai"
-	APIAI_AUTH_PASSWORD = "?"
-)
+// server context used by all handlers
+type Env struct {
+	db         *gorm.DB
+	store      *sessions.CookieStore
+	ApiaiCreds BasicAuthCreds
+
+	authenticate_everyone_as string // only use for testing
+}
 
 func (env *Env) BasicAuthHandler(username string, password string, next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, _ := r.BasicAuth()
 		// if incorrect credentials, forbid access and return
-		if !(user == APIAI_AUTH_USERNAME && pass == APIAI_AUTH_PASSWORD) {
+		if !(user == env.ApiaiCreds.Username && pass == env.ApiaiCreds.Password) {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -76,7 +74,7 @@ func (env *Env) CreateHTTPHandler() http.Handler {
 
 	// apiai webhook for "fulfillment"
 	router.Handle("/webhook",
-		env.BasicAuthHandler(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD,
+		env.BasicAuthHandler(env.ApiaiCreds.Username, env.ApiaiCreds.Password,
 			env.ApiaiWebhookHandler)).Methods("POST")
 
 	// "api" routes
@@ -116,7 +114,7 @@ func ReadConfigFile(filename string) (cfgRet *ServerConfigInfo, err error) {
 	return &cfg, nil
 }
 
-func InitConfigInfo(filename string) error {
+func (env *Env) LoadConfigInfo(filename string) error {
 	// load configuration
 	cfg, err := ReadConfigFile(filename)
 	if err != nil {
@@ -124,19 +122,21 @@ func InitConfigInfo(filename string) error {
 	}
 
 	// init cookie store
-	store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
+	env.store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
 
+	// TODO: make this a property of Env, not global
 	// global oauth config
 	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
 	googleOauthConfig.ClientID = cfg.GoogleClientID
 	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
 
 	// http basic auth for apiai
-	APIAI_AUTH_USERNAME = cfg.ApiaiAuthUsername
-	APIAI_AUTH_PASSWORD = cfg.ApiaiAuthPassword
-
-	if APIAI_AUTH_USERNAME == "" || APIAI_AUTH_PASSWORD == "" {
+	if cfg.ApiaiAuthUsername == "" || cfg.ApiaiAuthPassword == "" {
 		log.Fatal("Apiai basic auth not set correctly in config file:", filename)
+	}
+	env.ApiaiCreds = BasicAuthCreds{
+		Username: cfg.ApiaiAuthUsername,
+		Password: cfg.ApiaiAuthPassword,
 	}
 
 	return nil
@@ -175,12 +175,6 @@ func main() {
 
 	var err error
 
-	err = InitConfigInfo(*cfgPath)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
 	// sqlite3 database
 	fmt.Printf("Connecting to database: %q\n", *dbPath)
 	var db *gorm.DB
@@ -205,7 +199,13 @@ func main() {
 
 	env := &Env{}
 	env.db = db
-	env.store = store
+
+	// sets auth and initializes jkcookie store
+	err = env.LoadConfigInfo(*cfgPath)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
 	// log all requests
 	loggedRouter := handlers.LoggingHandler(os.Stdout, env.CreateHTTPHandler())

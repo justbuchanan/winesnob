@@ -46,7 +46,7 @@ func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 
-	session, err := store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, SESSION_NAME)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
-	sess, err := store.Get(r, SESSION_NAME)
+	sess, err := env.store.Get(r, SESSION_NAME)
 	if err != nil {
 		log.Fatal(err)
 		// TODO: set error http
@@ -103,7 +103,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
 	if stringInSlice(result.Email, ALLOWED_USERS) {
-		session, err := store.Get(r, SESSION_NAME)
+		session, err := env.store.Get(r, SESSION_NAME)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -125,7 +125,7 @@ func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, SESSION_NAME)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

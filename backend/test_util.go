@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
@@ -21,11 +20,6 @@ import (
 func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	t.Log("Initializing context")
 
-	err := InitConfigInfo("../cellar-config.json.example")
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	db, _ := gorm.Open("sqlite3", ":memory:")
 	defer db.Close()
 	db.LogMode(false)
@@ -34,8 +28,12 @@ func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	db.AutoMigrate(&WineInfo{})
 
 	env := &Env{
-		db:    db,
-		store: sessions.NewCookieStore([]byte("wahphuR0eethoo8R")),
+		db: db,
+	}
+
+	err := env.LoadConfigInfo("../cellar-config.json.example")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	// run http server
@@ -46,17 +44,17 @@ func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	f(t, ts, env)
 }
 
-func GetActionResponseFromJSON(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
+func (env *Env) GetActionResponseFromJSON(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
 	var testReq apiai.ActionRequest
 	err := json.Unmarshal([]byte(jsonStr), &testReq)
 	if err != nil {
 		t.Fatal("parse error:", err)
 	}
 
-	return GetActionResponse(t, ts, &testReq)
+	return env.GetActionResponse(t, ts, &testReq)
 }
 
-func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
+func (env *Env) GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionRequest) *apiai.ActionResponse {
 	// build POST request with apiai request
 	jsonValue, _ := json.Marshal(req)
 	httpReq, err := http.NewRequest("POST", ts.URL+"/webhook", bytes.NewBuffer(jsonValue))
@@ -65,7 +63,7 @@ func GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.ActionReque
 		return nil
 	}
 	// use basic auth to authenticate
-	httpReq.SetBasicAuth(APIAI_AUTH_USERNAME, APIAI_AUTH_PASSWORD)
+	httpReq.SetBasicAuth(env.ApiaiCreds.Username, env.ApiaiCreds.Password)
 
 	// do it!
 	var res *http.Response

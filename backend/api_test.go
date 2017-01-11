@@ -29,7 +29,7 @@ func TestApiBlockedWhenNotLoggedIn(t *testing.T) {
 
 func TestEmptyResponse(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		actionResponse := GetActionResponse(t, ts, &apiai.ActionRequest{})
+		actionResponse := env.GetActionResponse(t, ts, &apiai.ActionRequest{})
 		assert.Nil(t, actionResponse)
 	})
 }
