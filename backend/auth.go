@@ -35,8 +35,7 @@ type GoogleOauth2Result struct {
 	Locale        string `json:"locale"`
 }
 
-// sends forbidden http response and returns false if the user isn't authenticated
-func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
+func (env *Env) CheckLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// fake auth - only for testing
 	if env.authenticate_everyone_as != "" {
 		return true
@@ -52,7 +51,6 @@ func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 
-	http.Error(w, "need to authenticate", http.StatusForbidden)
 	return false
 }
 
