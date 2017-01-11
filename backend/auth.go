@@ -9,8 +9,6 @@ import (
 	"net/http"
 )
 
-var ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
-
 var (
 	// googleOauthConfig = &oauth2.Config{
 	// 	RedirectURL:  "http://localhost:4200/oauth2/google-callback",
@@ -50,7 +48,7 @@ func (env *Env) EnsureLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	email := session.Values["email"]
-	if email != nil && stringInSlice(email.(string), ALLOWED_USERS) {
+	if email != nil && stringInSlice(email.(string), env.AllowedUsers) {
 		return true
 	}
 
@@ -100,7 +98,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	var result GoogleOauth2Result
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
-	if stringInSlice(result.Email, ALLOWED_USERS) {
+	if stringInSlice(result.Email, env.AllowedUsers) {
 		session, err := env.store.Get(r, SESSION_NAME)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

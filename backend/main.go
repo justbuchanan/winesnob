@@ -43,6 +43,7 @@ type ServerConfigInfo struct {
 	CookieSecret       string
 	ApiaiAuthUsername  string
 	ApiaiAuthPassword  string
+	AllowedUsers       []string // whitelist of google accounts (ex: ['justin@gmail.com'])
 }
 
 type BasicAuthCreds struct {
@@ -55,6 +56,7 @@ type Env struct {
 	store              *sessions.CookieStore
 	ApiaiCreds         BasicAuthCreds
 	GoogleOauth2Config oauth2.Config
+	AllowedUsers       []string
 
 	authenticate_everyone_as string // only use for testing
 }
@@ -137,6 +139,9 @@ func (env *Env) LoadConfigInfo(filename string) error {
 			"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint: google.Endpoint,
 	}
+
+	// google account whitelist
+	env.AllowedUsers = cfg.AllowedUsers
 
 	// http basic auth for apiai
 	env.ApiaiCreds = BasicAuthCreds{
