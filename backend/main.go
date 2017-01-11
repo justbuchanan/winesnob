@@ -19,6 +19,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/renstrom/fuzzysearch/fuzzy"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 const SESSION_NAME = "cellar"
@@ -48,9 +51,10 @@ type BasicAuthCreds struct {
 
 // server context used by all handlers
 type Env struct {
-	db         *gorm.DB
-	store      *sessions.CookieStore
-	ApiaiCreds BasicAuthCreds
+	db                 *gorm.DB
+	store              *sessions.CookieStore
+	ApiaiCreds         BasicAuthCreds
+	GoogleOauth2Config oauth2.Config
 
 	authenticate_everyone_as string // only use for testing
 }
@@ -82,7 +86,7 @@ func (env *Env) CreateHTTPHandler() http.Handler {
 	api.HandleFunc("/wine/{wineId}", env.WineHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", env.WineDeleteHandler).Methods("DELETE")
 	api.HandleFunc("/wines", env.WineCreateHandler).Methods("POST")
-	   api.HandleFunc("/wines", env.WinesIndexHandler).Methods("GET")
+	api.HandleFunc("/wines", env.WinesIndexHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", env.WineUpdateHandler).Methods("PUT")
 
 	router.HandleFunc("/oauth2/login", env.handleGoogleLogin)
@@ -124,16 +128,17 @@ func (env *Env) LoadConfigInfo(filename string) error {
 	// init cookie store
 	env.store = sessions.NewCookieStore([]byte(cfg.CookieSecret))
 
-	// TODO: make this a property of Env, not global
-	// global oauth config
-	googleOauthConfig.RedirectURL = cfg.BaseURL + "/oauth2/google-callback"
-	googleOauthConfig.ClientID = cfg.GoogleClientID
-	googleOauthConfig.ClientSecret = cfg.GoogleClientSecret
+	// oauth2 config
+	env.GoogleOauth2Config = oauth2.Config{
+		RedirectURL:  cfg.BaseURL + "/oauth2/google-callback",
+		ClientID:     cfg.GoogleClientID,
+		ClientSecret: cfg.GoogleClientSecret,
+		Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email"},
+		Endpoint: google.Endpoint,
+	}
 
 	// http basic auth for apiai
-	if cfg.ApiaiAuthUsername == "" || cfg.ApiaiAuthPassword == "" {
-		log.Fatal("Apiai basic auth not set correctly in config file:", filename)
-	}
 	env.ApiaiCreds = BasicAuthCreds{
 		Username: cfg.ApiaiAuthUsername,
 		Password: cfg.ApiaiAuthPassword,

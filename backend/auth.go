@@ -3,27 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 var ALLOWED_USERS = []string{"justbuchanan@gmail.com", "propinvestments@gmail.com"}
 
 var (
-	googleOauthConfig = &oauth2.Config{
-		RedirectURL:  "http://localhost:4200/oauth2/google-callback",
-		ClientID:     "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
-		ClientSecret: "lG7MbRpyc5joTUXPLyI9Ymft",
-		Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
-			"https://www.googleapis.com/auth/userinfo.email"},
-		Endpoint: google.Endpoint,
-	}
+	// googleOauthConfig = &oauth2.Config{
+	// 	RedirectURL:  "http://localhost:4200/oauth2/google-callback",
+	// 	ClientID:     "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
+	// 	ClientSecret: "lG7MbRpyc5joTUXPLyI9Ymft",
+	// 	Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
+	// 		"https://www.googleapis.com/auth/userinfo.email"},
+	// 	Endpoint: google.Endpoint,
+	// }
 	// Some random string, random for each request
-	oauthStateString = "random"
+	oauthStateString = "random" // TODO: this shouldn't be a constant
 )
 
 type GoogleOauth2Result struct {
@@ -87,7 +85,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := r.FormValue("code")
-	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
+	token, err := env.GoogleOauth2Config.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		fmt.Println("Code exchange failed with:", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -120,7 +118,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	url := env.GoogleOauth2Config.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
