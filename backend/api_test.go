@@ -55,7 +55,7 @@ func TestFakeAuthentication(t *testing.T) {
 	})
 }
 
-func TestCreateGetDelete(t *testing.T) {
+func TestCreate(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.authenticate_everyone_as = "someone"
 
@@ -88,7 +88,5 @@ func TestCreateGetDelete(t *testing.T) {
 		assert.Equal(t, wineToCreate.Available, wine.Available)
 		assert.Equal(t, wineToCreate.Name, wine.Name)
 		assert.Equal(t, wineToCreate.Description, wine.Description)
-
-		// http.Delete(ts.URL + "wines/" + )
 	})
 }
