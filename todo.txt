@@ -6,8 +6,6 @@
   * dialog
 * fix issue where agent repeats previous response mindlessly
 * fix displayText property for apiai response
-* mock auth for testing
-* test everything
 * longer preview:
     * http://stackoverflow.com/questions/41088596/make-google-actions-development-project-preview-persist-longer
 * Inline edit?

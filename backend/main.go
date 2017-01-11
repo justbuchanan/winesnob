@@ -82,7 +82,7 @@ func (env *Env) CreateHTTPHandler() http.Handler {
 	api.HandleFunc("/wine/{wineId}", env.WineHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", env.WineDeleteHandler).Methods("DELETE")
 	api.HandleFunc("/wines", env.WineCreateHandler).Methods("POST")
-	api.HandleFunc("/wines", env.WinesIndexHandler).Methods("GET")
+		   api.HandleFunc("/wines", env.WinesIndexHandler).Methods("GET")
 	api.HandleFunc("/wine/{wineId}", env.WineUpdateHandler).Methods("PUT")
 
 	router.HandleFunc("/oauth2/login", env.handleGoogleLogin)

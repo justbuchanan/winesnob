@@ -47,7 +47,7 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err = env.db.Create(&wine).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, `{"error": "` + string(err.Error()) + `"}`)
+		fmt.Fprintf(w, `{"error": "`+string(err.Error())+`"}`)
 		return
 	}
 

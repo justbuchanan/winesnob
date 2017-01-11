@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/justbuchanan/winesnob/backend/apiai"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
-	"encoding/json"
 )
 
 func TestJoinWordSeries(t *testing.T) {
@@ -61,9 +61,9 @@ func TestCreate(t *testing.T) {
 
 		// send request to create a wine
 		wineToCreate := WineInfo{
-			Name: "amarone 1",
+			Name:        "amarone 1",
 			Description: "In the fields of Tuscany...",
-			Available: true,
+			Available:   true,
 		}
 		b, err := json.Marshal(wineToCreate)
 		if err != nil {
