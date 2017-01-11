@@ -10,12 +10,9 @@ import (
 const RequestDescribeAmarone = `
     {
       "result": {
-        "source": "agent",
-        "resolvedQuery": "tell me about the amarone",
         "parameters": {
           "wine-descriptor": "amarone"
         },
-        "contexts": [],
         "metadata": {
           "intentName": "wine.describe"
         }
@@ -44,30 +41,27 @@ const RequestDeleteStagsLeapMerlot = `
         }
     }`
 
-func TestDescribeWines(t *testing.T) {
+func TestDescribeAmarone1(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.LoadWinesFromJSONIntoDb("test-wines.json")
-		// request wine.describe(amarone)
 		testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-		if testResp == nil {
-			t.Fatal("wine.describe(amarone) -> nil response")
-		}
-		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-		t.Log("Response:", testResp.Speech)
-
-		// clear db
-		env.ClearDb()
-		var count uint64
-		env.db.Model(&WineInfo{}).Count(&count)
-		assert.Equal(t, 0, int(count))
-
-		env.LoadWinesFromJSONIntoDb("../wine-list.json")
-
-		// same request as before, but against a different wine list
-		testResp = GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-		assert.NotNil(t, testResp)
+        if assert.NotNil(t, testResp) {
+            assert.Equal(t, "amarone: Amarone description", testResp.Speech)
+            t.Log("Response:", testResp.Speech)
+        }
 	})
 }
+
+// same as above, but against a different wine list
+func TestDescribeAmarone2(t *testing.T) {
+    WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+        env.LoadWinesFromJSONIntoDb("../wine-list.json")
+        testResp := GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+        assert.NotNil(t, testResp)
+        t.Log("Response:", testResp)
+    })
+}
+
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
