@@ -14,7 +14,7 @@ func TestJoinWordSeries(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func TestBlockedWhenNotLoggedIn(t *testing.T) {
+func TestApiBlockedWhenNotLoggedIn(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		// test authentication required
 		res, err := http.Get(ts.URL + "/api/wines")

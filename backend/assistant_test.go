@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -110,5 +111,19 @@ func TestWineDescriptorLookup(t *testing.T) {
 		// bad match
 		result = env.WineDescriptorLookup("bla bla bla")
 		assert.Nil(t, result)
+	})
+}
+
+func TestWebhookBlockedWhenNotLoggedIn(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+		res, err := http.Post(ts.URL+"/webhook", "application/json", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if res.StatusCode != http.StatusForbidden {
+			t.Log("Response:", res)
+			t.Fatal("Apiai webhook should require http basic auth")
+		}
 	})
 }
