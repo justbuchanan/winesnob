@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -74,14 +73,8 @@ func (env *Env) GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.
 	}
 
 	// parse response body json
-	body, _ := ioutil.ReadAll(res.Body)
-	if err != nil {
-		t.Log(err)
-		return nil
-	}
-	t.Log("body: ", string(body))
 	var apiResp apiai.ActionResponse
-	err = json.Unmarshal(body, &apiResp)
+	err = json.NewDecoder(res.Body).Decode(&apiResp)
 	if err != nil {
 		t.Log(err)
 		return nil

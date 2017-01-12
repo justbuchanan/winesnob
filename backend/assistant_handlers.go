@@ -22,7 +22,7 @@ func (env *Env) IntentWineList(req apiai.ActionRequest) *apiai.ActionResponse {
 	var wines []WineInfo
 	env.db.Find(&wines)
 	for _, elem := range wines {
-		if (color == "" || (color == "red" == elem.Red)) && elem.Available {
+		if (color == "" || ((color == "red") == elem.Red)) && elem.Available {
 			wineNames = append(wineNames, elem.Name)
 		}
 	}
