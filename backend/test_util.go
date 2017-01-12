@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
 	"net/http"
 	"net/http/httptest"
@@ -17,16 +15,11 @@ import (
 func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 	t.Log("Initializing context")
 
-	db, _ := gorm.Open("sqlite3", ":memory:")
-	defer db.Close()
-	db.LogMode(false)
-
-	// setup schema
-	db.AutoMigrate(&WineInfo{})
-
-	env := &Env{
-		db: db,
-	}
+	// setup Env and db
+	env := &Env{}
+	env.InitDB(":memory:")
+	defer env.db.Close()
+	env.db.LogMode(false)
 
 	err := env.LoadConfigInfo("../cellar-config.json.example")
 	if err != nil {

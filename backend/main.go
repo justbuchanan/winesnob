@@ -151,21 +151,11 @@ func LoadWinesFromFileIntoDb(db *gorm.DB, filename string) error {
 	return nil
 }
 
-func main() {
-	// command-line flags
-	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
-	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
-	cfgPath := flag.String("config", "./cellar-config.json", "Path to server config file")
-	port := flag.String("port", "8080", "listen on port")
-	flag.Parse()
-
-	var err error
-
+// Note: remember to defer env.db.Close()
+func (env *Env) InitDB(filename string) {
 	// sqlite3 database
-	fmt.Printf("Connecting to database: %q\n", *dbPath)
-	var db *gorm.DB
-	db, err = gorm.Open("sqlite3", *dbPath)
-	defer db.Close()
+	fmt.Printf("Connecting to database: %q\n", filename)
+	db, err := gorm.Open("sqlite3", filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -174,18 +164,29 @@ func main() {
 	// setup schema
 	db.AutoMigrate(&WineInfo{})
 
+	env.db = db
+}
+
+func main() {
+	// command-line flags
+	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
+	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
+	cfgPath := flag.String("config", "./cellar-config.json", "Path to server config file")
+	port := flag.String("port", "8080", "listen on port")
+	flag.Parse()
+
+	// setup Env and db
+	env := &Env{}
+	env.InitDB(*dbPath)
+	defer env.db.Close()
 	if *loadSamples {
-		if err = LoadWinesFromFileIntoDb(db, "wine-list.json"); err != nil {
+		if err := LoadWinesFromFileIntoDb(env.db, "wine-list.json"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	env := &Env{
-		db: db,
-	}
-
 	// sets auth and initializes cookie store
-	err = env.LoadConfigInfo(*cfgPath)
+	err := env.LoadConfigInfo(*cfgPath)
 	if err != nil {
 		log.Fatal(err)
 	}
