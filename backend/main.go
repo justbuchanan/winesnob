@@ -154,12 +154,10 @@ func LoadWinesFromFileIntoDb(db *gorm.DB, filename string) error {
 // Note: remember to defer env.db.Close()
 func (env *Env) InitDB(filename string) {
 	// sqlite3 database
-	fmt.Printf("Connecting to database: %q\n", filename)
 	db, err := gorm.Open("sqlite3", filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.LogMode(true)
 
 	// setup schema
 	db.AutoMigrate(&WineInfo{})
@@ -177,7 +175,9 @@ func main() {
 
 	// setup Env and db
 	env := &Env{}
+	fmt.Printf("Connecting to database: %q\n", *dbPath)
 	env.InitDB(*dbPath)
+	env.db.LogMode(true)
 	defer env.db.Close()
 	if *loadSamples {
 		if err := LoadWinesFromFileIntoDb(env.db, "wine-list.json"); err != nil {

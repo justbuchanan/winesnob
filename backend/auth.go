@@ -74,14 +74,21 @@ func (env *Env) CheckLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
-	sess, err := env.store.Get(r, SESSION_NAME)
-	if err != nil {
-		log.Fatal(err)
-		// TODO: set error http
-		return
-	}
+	var email string
 
-	email := sess.Values["email"]
+	if env.authenticate_everyone_as != "" {
+		// mock auth for testing
+		email = env.authenticate_everyone_as
+	} else {
+		// check session cookie
+		sess, err := env.store.Get(r, SESSION_NAME)
+		if err != nil {
+			SendError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		email = sess.Values["email"].(string)
+	}
 
 	js := map[string]interface{}{
 		"email": email,

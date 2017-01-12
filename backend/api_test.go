@@ -56,6 +56,26 @@ func TestFakeAuthentication(t *testing.T) {
 	})
 }
 
+func TestLoginStatus(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+		env.authenticate_everyone_as = "drunk@cellar.edu"
+		res, err := http.Get(ts.URL + "/oauth2/login-status")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+
+		var obj map[string]string
+		err = json.NewDecoder(res.Body).Decode(&obj)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log("obj: ", obj)
+		assert.Equal(t, env.authenticate_everyone_as, obj["email"])
+	})
+}
+
 func TestCreate(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		env.authenticate_everyone_as = "someone"
