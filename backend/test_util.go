@@ -83,10 +83,6 @@ func (env *Env) GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.
 	return &apiResp
 }
 
-func (env *Env) ClearDb() {
-	env.db.Where("").Delete(&WineInfo{})
-}
-
 func (env *Env) LoadWinesFromJSONIntoDb(filename string) {
 	wines, err := ReadWinesFromFile(filename)
 	if err != nil {
