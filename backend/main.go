@@ -76,12 +76,12 @@ func (env *Env) BasicAuthHandler(username string, password string, next http.Han
 }
 
 // check oauth2 status before forwarding to main api handler
-type AuthGate struct {
-	handler func(http.ResponseWriter, *http.Request)
+type OAuthGate struct {
+	handler http.HandlerFunc
 	env     *Env
 }
 
-func (ag *AuthGate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ag *OAuthGate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if ag.env.CheckLoggedIn(w, r) {
 		ag.handler(w, r)
 		return
@@ -100,11 +100,11 @@ func (env *Env) CreateHTTPHandler() http.Handler {
 
 	// "api" routes
 	api := router.PathPrefix("/api").Subrouter()
-	api.Handle("/wine/{wineId}", &AuthGate{handler: env.WineHandler, env: env}).Methods("GET")
-	api.Handle("/wine/{wineId}", &AuthGate{handler: env.WineDeleteHandler, env: env}).Methods("DELETE")
-	api.Handle("/wines", &AuthGate{handler: env.WineCreateHandler, env: env}).Methods("POST")
-	api.Handle("/wines", &AuthGate{handler: env.WinesIndexHandler, env: env}).Methods("GET")
-	api.Handle("/wine/{wineId}", &AuthGate{handler: env.WineUpdateHandler, env: env}).Methods("PUT")
+	api.Handle("/wine/{wineId}", &OAuthGate{handler: env.WineHandler, env: env}).Methods("GET")
+	api.Handle("/wine/{wineId}", &OAuthGate{handler: env.WineDeleteHandler, env: env}).Methods("DELETE")
+	api.Handle("/wines", &OAuthGate{handler: env.WineCreateHandler, env: env}).Methods("POST")
+	api.Handle("/wines", &OAuthGate{handler: env.WinesIndexHandler, env: env}).Methods("GET")
+	api.Handle("/wine/{wineId}", &OAuthGate{handler: env.WineUpdateHandler, env: env}).Methods("PUT")
 
 	router.HandleFunc("/oauth2/login", env.handleGoogleLogin)
 	router.HandleFunc("/oauth2/logout", env.handleGoogleLogout)

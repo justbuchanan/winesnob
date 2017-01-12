@@ -88,5 +88,48 @@ func TestCreate(t *testing.T) {
 		assert.Equal(t, wineToCreate.Available, wine.Available)
 		assert.Equal(t, wineToCreate.Name, wine.Name)
 		assert.Equal(t, wineToCreate.Description, wine.Description)
+
+		t.Log("Update...")
+		wine.Name = "merlot"
+		b, err = json.Marshal(wine)
+		var updateReq *http.Request
+		updateReq, err = http.NewRequest("PUT", ts.URL+"/api/wine/"+wine.ID, bytes.NewBuffer(b))
+		res, err = http.DefaultClient.Do(updateReq)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if assert.NotNil(t, res) {
+			assert.Equal(t, http.StatusOK, res.StatusCode)
+		}
+
+		t.Log("Get")
+		res, err = http.Get(ts.URL + "/api/wine/" + wine.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var gottenWine *WineInfo
+		err = json.NewDecoder(res.Body).Decode(&gottenWine)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, wine.Name, gottenWine.Name)
+
+		t.Log("Delete")
+		var deleteReq *http.Request
+		deleteReq, err = http.NewRequest("DELETE", ts.URL+"/api/wine/"+wine.ID, nil)
+		res, err = http.DefaultClient.Do(deleteReq)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, http.StatusOK, res.StatusCode)
+
+		t.Log("Get again")
+		res, err = http.Get(ts.URL + "/api/wine/" + wine.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	})
 }
