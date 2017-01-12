@@ -6,5 +6,5 @@ wine:
         - LETSENCRYPT_EMAIL=justbuchanan@gmail.com
         - LETSENCRYPT_HOST=cellar.justbuchanan.com
     volumes:
-      - /home/justin/cellar-data/cellar.sqlite3db:/data/cellar.sqlite3db
+      - /home/justin/cellar-data/:/data
       - ./cellar-config.json:/etc/cellar-config.json:ro
