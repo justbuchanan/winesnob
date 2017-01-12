@@ -175,8 +175,7 @@ func main() {
 	db.AutoMigrate(&WineInfo{})
 
 	if *loadSamples {
-		err = LoadWinesFromFileIntoDb(db, "wine-list.json")
-		if err != nil {
+		if err = LoadWinesFromFileIntoDb(db, "wine-list.json"); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -185,7 +184,7 @@ func main() {
 		db: db,
 	}
 
-	// sets auth and initializes jkcookie store
+	// sets auth and initializes cookie store
 	err = env.LoadConfigInfo(*cfgPath)
 	if err != nil {
 		log.Fatal(err)
