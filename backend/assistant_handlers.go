@@ -134,9 +134,8 @@ func (env *Env) IntentWineQuery(req apiai.ActionRequest) *apiai.ActionResponse {
 }
 
 func (env *Env) ApiaiWebhookHandler(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	var req apiai.ActionRequest
-	err := decoder.Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Invalid request")

@@ -78,9 +78,8 @@ func TestCreate(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 
 		// decode response and make sure it's the same as we sent
-		decoder := json.NewDecoder(res.Body)
 		var wine WineInfo
-		err = decoder.Decode(&wine)
+		err = json.NewDecoder(res.Body).Decode(&wine)
 		if err != nil {
 			t.Fatal(err)
 		}

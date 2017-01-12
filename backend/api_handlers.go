@@ -27,9 +27,8 @@ func (env *Env) WineDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	var wine WineInfo
-	err := decoder.Decode(&wine)
+	err := json.NewDecoder(r.Body).Decode(&wine)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid JSON"})
@@ -57,9 +56,8 @@ func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: ensure wineID already exists?
 
-	decoder := json.NewDecoder(r.Body)
 	var wine WineInfo
-	err := decoder.Decode(&wine)
+	err := json.NewDecoder(r.Body).Decode(&wine)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid JSON"})
