@@ -1,6 +1,6 @@
 machine:
   environment:
-    GOPATH: $HOME/.go_project
+    GOPATH: $HOME/.go_workspace
     PATH: $PATH:$GOPATH/bin
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
 
@@ -11,8 +11,6 @@ dependencies:
     - go get -u github.com/mattn/goveralls
     - mkdir -p "$GOPATH/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
-  cache_directories:
-    - $GOPATH
 
 test:
   pre:
