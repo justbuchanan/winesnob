@@ -66,7 +66,7 @@ func (env *Env) CheckLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	email := session.Values["email"]
-	if email != nil && stringInSlice(email.(string), env.AllowedUsers) {
+	if email != nil && StringInSlice(email.(string), env.AllowedUsers) {
 		return true
 	}
 
@@ -115,7 +115,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	var result GoogleOauth2Result
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
-	if stringInSlice(result.Email, env.AllowedUsers) {
+	if StringInSlice(result.Email, env.AllowedUsers) {
 		session, err := env.store.Get(r, SESSION_NAME)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
