@@ -9,18 +9,37 @@ import (
 	"net/http"
 )
 
-var (
-	// googleOauthConfig = &oauth2.Config{
-	// 	RedirectURL:  "http://localhost:4200/oauth2/google-callback",
-	// 	ClientID:     "1054965996082-b4rkamlpm0pou1v53h40kecds54d1h8p.apps.googleusercontent.com",
-	// 	ClientSecret: "lG7MbRpyc5joTUXPLyI9Ymft",
-	// 	Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
-	// 		"https://www.googleapis.com/auth/userinfo.email"},
-	// 	Endpoint: google.Endpoint,
-	// }
-	// Some random string, random for each request
-	oauthStateString = "random" // TODO: this shouldn't be a constant
-)
+type BasicAuthCreds struct {
+	Username, Password string
+}
+
+func (env *Env) BasicAuthHandler(username string, password string, next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, _ := r.BasicAuth()
+		// if incorrect credentials, forbid access and return
+		if !(user == env.ApiaiCreds.Username && pass == env.ApiaiCreds.Password) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		// if everything checks out, run next handler
+		next(w, r)
+	})
+}
+
+// check oauth2 status before forwarding to next handler
+func (env *Env) OAuthGate(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if env.CheckLoggedIn(w, r) {
+			next(w, r)
+		} else {
+			http.Error(w, "need to authenticate", http.StatusForbidden)
+		}
+	})
+}
+
+// TODO: this shouldn't be a constant
+var oauthStateString = "random"
 
 type GoogleOauth2Result struct {
 	ID            string `json:"id"`
