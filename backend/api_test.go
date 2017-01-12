@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -92,7 +93,7 @@ func TestCreate(t *testing.T) {
 		wine.Name = "merlot"
 		b, err = json.Marshal(wine)
 		var updateReq *http.Request
-		updateReq, err = http.NewRequest("PUT", ts.URL+"/api/wine/"+wine.ID, bytes.NewBuffer(b))
+		updateReq, err = http.NewRequest("PUT", ts.URL+"/api/wine/"+strconv.Itoa(wine.ID), bytes.NewBuffer(b))
 		res, err = http.DefaultClient.Do(updateReq)
 		if err != nil {
 			t.Fatal(err)
@@ -102,7 +103,7 @@ func TestCreate(t *testing.T) {
 		}
 
 		t.Log("Get")
-		res, err = http.Get(ts.URL + "/api/wine/" + wine.ID)
+		res, err = http.Get(ts.URL + "/api/wine/" + strconv.Itoa(wine.ID))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -116,7 +117,7 @@ func TestCreate(t *testing.T) {
 
 		t.Log("Delete")
 		var deleteReq *http.Request
-		deleteReq, err = http.NewRequest("DELETE", ts.URL+"/api/wine/"+wine.ID, nil)
+		deleteReq, err = http.NewRequest("DELETE", ts.URL+"/api/wine/"+strconv.Itoa(wine.ID), nil)
 		res, err = http.DefaultClient.Do(deleteReq)
 		if err != nil {
 			t.Fatal(err)
@@ -124,7 +125,7 @@ func TestCreate(t *testing.T) {
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 
 		t.Log("Get again")
-		res, err = http.Get(ts.URL + "/api/wine/" + wine.ID)
+		res, err = http.Get(ts.URL + "/api/wine/" + strconv.Itoa(wine.ID))
 		if err != nil {
 			t.Fatal(err)
 		}

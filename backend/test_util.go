@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
@@ -83,19 +82,10 @@ func (env *Env) GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.
 	return &apiResp
 }
 
+// TODO: delete this wrapper
 func (env *Env) LoadWinesFromJSONIntoDb(filename string) {
-	wines, err := ReadWinesFromFile(filename)
+	err := LoadSamplesIntoDb(env.db, filename)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	// insert into database
-	for _, wine := range wines {
-		wine.ID = GenerateUniqueID(env.db)
-		err = env.db.Create(&wine).Error
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
 	}
 }

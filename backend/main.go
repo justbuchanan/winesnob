@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -32,7 +31,7 @@ type WineInfo struct {
 	Red         bool   `json:"red"`
 	Available   bool   `json:"available"`
 
-	ID string `json:"id"`
+	ID int `json:"id" sql:"AUTO_INCREMENT" gorm:"primary_key"`
 }
 
 // see cellar-config.json.example for info
@@ -67,11 +66,11 @@ func (env *Env) CreateHTTPHandler() http.Handler {
 
 	// "api" routes
 	api := router.PathPrefix("/api").Subrouter()
-	api.Handle("/wine/{wineId}", env.OAuthGate(env.WineHandler)).Methods("GET")
-	api.Handle("/wine/{wineId}", env.OAuthGate(env.WineDeleteHandler)).Methods("DELETE")
+	api.Handle("/wine/{wineID}", env.OAuthGate(env.WineHandler)).Methods("GET")
+	api.Handle("/wine/{wineID}", env.OAuthGate(env.WineDeleteHandler)).Methods("DELETE")
 	api.Handle("/wines", env.OAuthGate(env.WineCreateHandler)).Methods("POST")
 	api.Handle("/wines", env.OAuthGate(env.WinesIndexHandler)).Methods("GET")
-	api.Handle("/wine/{wineId}", env.OAuthGate(env.WineUpdateHandler)).Methods("PUT")
+	api.Handle("/wine/{wineID}", env.OAuthGate(env.WineUpdateHandler)).Methods("PUT")
 
 	router.HandleFunc("/oauth2/login", env.handleGoogleLogin)
 	router.HandleFunc("/oauth2/logout", env.handleGoogleLogout)
@@ -142,9 +141,7 @@ func LoadSamplesIntoDb(db *gorm.DB, filename string) error {
 
 	// insert into database
 	for _, wine := range wines {
-		wine.ID = GenerateUniqueID(db)
-		err = db.Create(&wine).Error
-		if err != nil {
+		if err = db.Create(&wine).Error; err != nil {
 			return err
 		}
 	}
@@ -155,14 +152,11 @@ func LoadSamplesIntoDb(db *gorm.DB, filename string) error {
 }
 
 func main() {
-	// TODO: seed rng
-
+	// command-line flags
 	loadSamples := flag.Bool("load-samples", false, "Load samples from wine-list.json")
 	dbPath := flag.String("dbpath", "./wines.sqlite3db", "Path to sqlite3 database file")
 	cfgPath := flag.String("config", "./cellar-config.json", "Path to server config file")
-
 	port := flag.String("port", "8080", "listen on port")
-
 	flag.Parse()
 
 	var err error
@@ -174,7 +168,6 @@ func main() {
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 	db.LogMode(true)
 
@@ -185,18 +178,17 @@ func main() {
 		err = LoadSamplesIntoDb(db, "wine-list.json")
 		if err != nil {
 			log.Fatal(err)
-			os.Exit(1)
 		}
 	}
 
-	env := &Env{}
-	env.db = db
+	env := &Env{
+		db: db,
+	}
 
 	// sets auth and initializes jkcookie store
 	err = env.LoadConfigInfo(*cfgPath)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	// log all requests
@@ -217,7 +209,6 @@ func JoinWordSeries(items []string) string {
 }
 
 func ReadWinesFromFile(filename string) (wines []WineInfo, err error) {
-	// wines := make([]WineInfo, 4)
 	var file []byte
 	file, err = ioutil.ReadFile(filename)
 	if err != nil {
@@ -252,12 +243,10 @@ func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 	for _, wine := range wines {
 		r := fuzzy.RankMatch(descriptor, strings.ToLower(wine.Name))
 		if debug {
-			fmt.Printf("  %d ", r)
-			fmt.Println(wine.Name)
+			fmt.Printf("  %d %s\n", r, wine.Name)
 		}
 		if r != -1 && r < bestMatchR {
-			bestMatch = wine
-			bestMatchR = r
+			bestMatch, bestMatchR = wine, r
 		}
 	}
 
@@ -268,33 +257,6 @@ func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 		return &bestMatch
 	} else {
 		return nil
-	}
-}
-
-// Random generation borrowed from here:
-// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-func GenerateRandomID() string {
-	const length = 4
-	const letters = "abcdef0123456789"
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
-func GenerateUniqueID(db *gorm.DB) string {
-	for {
-		id := GenerateRandomID()
-		var count uint64
-		err := db.Model(&WineInfo{}).Where("id = ?", id).Count(&count).Error
-		if err != nil {
-			log.Fatal(err)
-			return ""
-		}
-		if count == 0 {
-			return id
-		}
 	}
 }
 
