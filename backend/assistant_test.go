@@ -41,6 +41,14 @@ const RequestDeleteStagsLeapMerlot = `
             }
         }
     }`
+const RequestListWines = `
+    {
+        "result": {
+            "metadata": {
+                "intentName": "wine.list"
+            }
+        }
+    }`
 
 func TestDescribeAmarone1(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
@@ -124,6 +132,15 @@ func TestWebhookBlockedWhenNotLoggedIn(t *testing.T) {
 		if res.StatusCode != http.StatusForbidden {
 			t.Log("Response:", res)
 			t.Fatal("Apiai webhook should require http basic auth")
+		}
+	})
+}
+
+func TestEmptyWineList(t *testing.T) {
+	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
+		qResp := env.GetActionResponseFromJSON(t, ts, RequestListWines)
+		if assert.NotNil(t, qResp) {
+			assert.True(t, strings.HasPrefix(qResp.Speech, "Sad day"))
 		}
 	})
 }
