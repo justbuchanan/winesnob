@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/justbuchanan/winesnob/backend/apiai"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -80,12 +79,4 @@ func (env *Env) GetActionResponse(t *testing.T, ts *httptest.Server, req *apiai.
 	}
 
 	return &apiResp
-}
-
-// TODO: delete this wrapper
-func (env *Env) LoadWinesFromJSONIntoDb(filename string) {
-	err := LoadSamplesIntoDb(env.db, filename)
-	if err != nil {
-		log.Fatal(err)
-	}
 }

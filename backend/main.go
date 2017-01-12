@@ -133,7 +133,7 @@ func (env *Env) LoadConfigInfo(filename string) error {
 	return nil
 }
 
-func LoadSamplesIntoDb(db *gorm.DB, filename string) error {
+func LoadWinesFromFileIntoDb(db *gorm.DB, filename string) error {
 	wines, err := ReadWinesFromFile(filename)
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func main() {
 	db.AutoMigrate(&WineInfo{})
 
 	if *loadSamples {
-		err = LoadSamplesIntoDb(db, "wine-list.json")
+		err = LoadWinesFromFileIntoDb(db, "wine-list.json")
 		if err != nil {
 			log.Fatal(err)
 		}

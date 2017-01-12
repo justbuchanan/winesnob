@@ -10,7 +10,7 @@ import (
 )
 
 func SendError(w http.ResponseWriter, statusCode int, text string) {
-	log.Println("Error", text)
+	log.Println("Error:", text)
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(map[string]string{"error": text})
 }
@@ -38,9 +38,6 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// assign a unique id
-	// wine.ID = GenerateUniqueID(env.db)
-
 	// try to create a new wine in the db
 	err = env.db.Create(&wine).Error
 	if err != nil {
@@ -55,7 +52,6 @@ func (env *Env) WineCreateHandler(w http.ResponseWriter, r *http.Request) {
 func (env *Env) WineUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	wineID, err := strconv.Atoi(mux.Vars(r)["wineID"])
 	if err != nil {
-		log.Println("at Update, wineID = ", mux.Vars(r)["wineID"])
 		SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}

@@ -44,7 +44,7 @@ const RequestDeleteStagsLeapMerlot = `
 
 func TestDescribeAmarone1(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJSONIntoDb("test-wines.json")
+		LoadWinesFromFileIntoDb(env.db, "test-wines.json")
 		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		if assert.NotNil(t, testResp) {
 			assert.Equal(t, "amarone: Amarone description", testResp.Speech)
@@ -56,7 +56,7 @@ func TestDescribeAmarone1(t *testing.T) {
 // same as above, but against a different wine list
 func TestDescribeAmarone2(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJSONIntoDb("../wine-list.json")
+		LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
 		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
 		assert.NotNil(t, testResp)
 		t.Log("Response:", testResp)
@@ -65,7 +65,7 @@ func TestDescribeAmarone2(t *testing.T) {
 
 func TestMarkUnavailable(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJSONIntoDb("../wine-list.json")
+		LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
 		// check that it's available
 		qResp := env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
 		if qResp == nil {
@@ -88,7 +88,7 @@ func TestMarkUnavailable(t *testing.T) {
 
 func TestWineDescriptorLookup(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		env.LoadWinesFromJSONIntoDb("test-wines.json")
+		LoadWinesFromFileIntoDb(env.db, "test-wines.json")
 		t.Log("Loaded test wines into db")
 
 		// exact match
