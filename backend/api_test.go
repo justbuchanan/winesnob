@@ -17,6 +17,11 @@ func TestJoinWordSeries(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
+func TestStringInSlice(t *testing.T) {
+	assert.True(t, StringInSlice("b", []string{"a", "b", "c"}))
+	assert.False(t, StringInSlice("d", []string{"a", "b", "c"}))
+}
+
 func TestApiBlockedWhenNotLoggedIn(t *testing.T) {
 	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
 		// test authentication required
