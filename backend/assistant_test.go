@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 )
@@ -51,96 +50,102 @@ const RequestListWines = `
     }`
 
 func TestDescribeAmarone1(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		LoadWinesFromFileIntoDb(env.db, "test-wines.json")
-		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-		if assert.NotNil(t, testResp) {
-			assert.Equal(t, "amarone: Amarone description", testResp.Speech)
-			t.Log("Response:", testResp.Speech)
-		}
-	})
+	env, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
+
+	LoadWinesFromFileIntoDb(env.db, "test-wines.json")
+	testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+	if assert.NotNil(t, testResp) {
+		assert.Equal(t, "amarone: Amarone description", testResp.Speech)
+		t.Log("Response:", testResp.Speech)
+	}
 }
 
 // same as above, but against a different wine list
 func TestDescribeAmarone2(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
-		testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
-		assert.NotNil(t, testResp)
-		t.Log("Response:", testResp)
-	})
+	env, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
+
+	LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
+	testResp := env.GetActionResponseFromJSON(t, ts, RequestDescribeAmarone)
+	assert.NotNil(t, testResp)
+	t.Log("Response:", testResp)
 }
 
 func TestMarkUnavailable(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
-		// check that it's available
-		qResp := env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
-		if qResp == nil {
-			t.Fatal("nil response")
-		}
-		if !strings.HasPrefix(qResp.Speech, "Yes") {
-			t.Fatal("Merlot should start out available")
-		}
+	env, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
 
-		// delete it
-		env.GetActionResponseFromJSON(t, ts, RequestDeleteStagsLeapMerlot)
+	LoadWinesFromFileIntoDb(env.db, "../wine-list.json")
+	// check that it's available
+	qResp := env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
+	if qResp == nil {
+		t.Fatal("nil response")
+	}
+	if !strings.HasPrefix(qResp.Speech, "Yes") {
+		t.Fatal("Merlot should start out available")
+	}
 
-		// ensure that it's not available
-		qResp = env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
-		if !strings.HasPrefix(qResp.Speech, "No") {
-			t.Fatal("Merlot should be gone after marking it unavailable")
-		}
-	})
+	// delete it
+	env.GetActionResponseFromJSON(t, ts, RequestDeleteStagsLeapMerlot)
+
+	// ensure that it's not available
+	qResp = env.GetActionResponseFromJSON(t, ts, RequestAvailabilityStagsLeapMerlot)
+	if !strings.HasPrefix(qResp.Speech, "No") {
+		t.Fatal("Merlot should be gone after marking it unavailable")
+	}
 }
 
 func TestWineDescriptorLookup(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		LoadWinesFromFileIntoDb(env.db, "test-wines.json")
-		t.Log("Loaded test wines into db")
+	env, _, cleanup := SetupTestServer(t)
+	defer cleanup()
 
-		// exact match
-		result := env.WineDescriptorLookup("chiraz")
-		if assert.NotNil(t, result) {
-			assert.Equal(t, "chiraz", result.Name)
-		}
+	LoadWinesFromFileIntoDb(env.db, "test-wines.json")
+	t.Log("Loaded test wines into db")
 
-		// approximate match
-		result = env.WineDescriptorLookup("chardonay") // missing an "n"
-		if assert.NotNil(t, result) {
-			assert.Equal(t, "chardonnay", result.Name)
-		}
+	// exact match
+	result := env.WineDescriptorLookup("chiraz")
+	if assert.NotNil(t, result) {
+		assert.Equal(t, "chiraz", result.Name)
+	}
 
-		result = env.WineDescriptorLookup("2013 amarone")
-		if assert.NotNil(t, result) {
-			assert.Equal(t, "2013 amarone", result.Name)
-		}
+	// approximate match
+	result = env.WineDescriptorLookup("chardonay") // missing an "n"
+	if assert.NotNil(t, result) {
+		assert.Equal(t, "chardonnay", result.Name)
+	}
 
-		// bad match
-		result = env.WineDescriptorLookup("bla bla bla")
-		assert.Nil(t, result)
-	})
+	result = env.WineDescriptorLookup("2013 amarone")
+	if assert.NotNil(t, result) {
+		assert.Equal(t, "2013 amarone", result.Name)
+	}
+
+	// bad match
+	result = env.WineDescriptorLookup("bla bla bla")
+	assert.Nil(t, result)
 }
 
 func TestWebhookBlockedWhenNotLoggedIn(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		res, err := http.Post(ts.URL+"/webhook", "application/json", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	_, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
 
-		if res.StatusCode != http.StatusForbidden {
-			t.Log("Response:", res)
-			t.Fatal("Apiai webhook should require http basic auth")
-		}
-	})
+	res, err := http.Post(ts.URL+"/webhook", "application/json", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.StatusCode != http.StatusForbidden {
+		t.Log("Response:", res)
+		t.Fatal("Apiai webhook should require http basic auth")
+	}
 }
 
 func TestEmptyWineList(t *testing.T) {
-	WineContext(t, func(t *testing.T, ts *httptest.Server, env *Env) {
-		qResp := env.GetActionResponseFromJSON(t, ts, RequestListWines)
-		if assert.NotNil(t, qResp) {
-			assert.True(t, strings.HasPrefix(qResp.Speech, "Sad day"))
-		}
-	})
+	env, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
+
+	qResp := env.GetActionResponseFromJSON(t, ts, RequestListWines)
+	if assert.NotNil(t, qResp) {
+		assert.True(t, strings.HasPrefix(qResp.Speech, "Sad day"))
+	}
 }

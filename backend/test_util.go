@@ -9,16 +9,13 @@ import (
 	"testing"
 )
 
-// configures, then initializes wine db with given file. Then executes each of
-// the given functions and cleans up.
-// Allows each test to be executed in a clean server state.
-func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
+// Note: need to defer ts.Close() and env.db.Close()
+func SetupTestServer(t *testing.T) (*Env, *httptest.Server, func()) {
 	t.Log("Initializing context")
 
 	// setup Env and db
 	env := &Env{}
 	env.InitDB(":memory:")
-	defer env.db.Close()
 	env.db.LogMode(false)
 
 	err := env.LoadConfigInfo("../cellar-config.json.example")
@@ -28,10 +25,13 @@ func WineContext(t *testing.T, f func(*testing.T, *httptest.Server, *Env)) {
 
 	// run http server
 	ts := httptest.NewServer(env.CreateHTTPHandler())
-	defer ts.Close()
 
-	// run function
-	f(t, ts, env)
+	cleanup := func() {
+		ts.Close()
+		env.db.Close()
+	}
+
+	return env, ts, cleanup
 }
 
 func (env *Env) GetActionResponseFromJSON(t *testing.T, ts *httptest.Server, jsonStr string) *apiai.ActionResponse {
