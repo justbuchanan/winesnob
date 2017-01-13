@@ -84,6 +84,17 @@ func TestLoginStatus(t *testing.T) {
 	assert.Equal(t, env.authenticate_everyone_as, obj["email"])
 }
 
+func TestLoginStatusWhenUnauthenticated(t *testing.T) {
+	_, ts, cleanup := SetupTestServer(t)
+	defer cleanup()
+
+	res, err := http.Get(ts.URL + "/oauth2/login-status")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusForbidden, res.StatusCode)
+}
+
 func TestCreate(t *testing.T) {
 	env, ts, cleanup := SetupTestServer(t)
 	defer cleanup()
