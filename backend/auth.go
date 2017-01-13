@@ -87,7 +87,12 @@ func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		email = sess.Values["email"].(string)
+		v, ok := sess.Values["email"]
+		if ok {
+			email = v.(string)
+		} else {
+			SendError(w, http.StatusForbidden, "Not logged in")
+		}
 	}
 
 	js := map[string]interface{}{
