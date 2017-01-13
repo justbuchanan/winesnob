@@ -1,13 +1,9 @@
-* implement "stop description" command
 * refactor item delete
   * show deletion immediately, dont require a page refresh
   * animation?
   * handle logic in part list, not part?
   * dialog
-* fix issue where agent repeats previous response mindlessly
 * fix displayText property for apiai response
-* longer preview:
-    * http://stackoverflow.com/questions/41088596/make-google-actions-development-project-preview-persist-longer
 * Inline edit?
 * improve layout of item card
   * right now a fixed header/footer size is assumed, but the bars shrink when the page is smaller
@@ -18,9 +14,8 @@
   * logout button is too big at top of page
   * "Cellar" text bumps into search bar
 * list wines that are in the registry, but not available
-
-
--- v1 cutoff
-
-* keyboard shortcuts
-
+* fix dev server oauth
+* implement "stop description" command
+* fix issue where agent repeats previous response mindlessly
+* longer preview:
+    * http://stackoverflow.com/questions/41088596/make-google-actions-development-project-preview-persist-longer
