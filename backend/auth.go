@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 )
 
@@ -38,8 +40,13 @@ func (env *Env) OAuthGate(next http.HandlerFunc) http.Handler {
 	})
 }
 
-// TODO: this shouldn't be a constant
-var oauthStateString = "random"
+// generate a random oauth state token
+// borrowed from: http://skarlso.github.io/2016/06/12/google-signin-with-go/
+func randToken() string {
+	b := make([]byte, 32)
+	rand.Read(b)
+	return base64.StdEncoding.EncodeToString(b)
+}
 
 type GoogleOauth2Result struct {
 	ID            string `json:"id"`
@@ -104,9 +111,19 @@ func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handleGoogleCallback")
-	state := r.FormValue("state")
-	if state != oauthStateString {
-		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+
+	// get session
+	session, err := env.store.Get(r, SESSION_NAME)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// email := session.Values["email"]
+	serverState := session.Values["state"]
+	clientState := r.FormValue("state")
+	if clientState != serverState {
+		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", serverState, clientState)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -128,12 +145,6 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(contents, &result)
 	fmt.Println("Got user: " + result.Email)
 	if StringInSlice(result.Email, env.AllowedUsers) {
-		session, err := env.store.Get(r, SESSION_NAME)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
 		session.Values["email"] = result.Email
 		session.Save(r, w)
 
@@ -145,7 +156,17 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	url := env.GoogleOauth2Config.AuthCodeURL(oauthStateString)
+	session, err := env.store.Get(r, SESSION_NAME)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	state := randToken()
+	session.Values["state"] = state
+	session.Save(r, w)
+
+	url := env.GoogleOauth2Config.AuthCodeURL(state)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
