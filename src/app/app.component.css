@@ -1,22 +1,22 @@
 md-toolbar {
-    background: #722f37;
-    color: white;
+  background: #722f37;
+  color: white;
 }
 
 md-toolbar.footer p {
-    font-size: 12pt;
-    text-align: center;
-    margin-left: 50px;
-    margin-right: 50px;
+  font-size: 12pt;
+  text-align: center;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 a[md-button] {
-    background: #DECB90;
-    color: #722f37;
+  background: #decb90;
+  color: #722f37;
 }
 
 md-toolbar.header p {
-    font-size: 10pt;
+  font-size: 10pt;
 }
 
 .flex-container {

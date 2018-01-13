@@ -1,27 +1,22 @@
-import { Input, Component, OnInit, EventEmitter } from '@angular/core';
-import { Wine } from '../wine';
-import { WineService } from '../wine.service';
-import { Router } from '@angular/router';
-import { FuzzyByPipe } from 'ng-pipes';
-
+import { Input, Component, OnInit, EventEmitter } from "@angular/core";
+import { Wine } from "../wine";
+import { WineService } from "../wine.service";
+import { Router } from "@angular/router";
+import { FuzzyByPipe } from "ng-pipes";
 
 @Component({
-  selector: 'app-wine-list',
-  templateUrl: './wine-list.component.html',
-  styleUrls: ['./wine-list.component.css'],
-  providers: [FuzzyByPipe],
+  selector: "app-wine-list",
+  templateUrl: "./wine-list.component.html",
+  styleUrls: ["./wine-list.component.css"],
+  providers: [FuzzyByPipe]
 })
 export class WineListComponent implements OnInit {
-
-  constructor(
-      private router: Router,
-      private wineService: WineService,
-      ) { }
+  constructor(private router: Router, private wineService: WineService) {}
 
   ngOnInit() {
-      this.wineService.getWines().then(wines => {
-        this.wines = wines;
-      })
+    this.wineService.getWines().then(wines => {
+      this.wines = wines;
+    });
   }
 
   deleteWine(wineId: string) {
@@ -32,15 +27,14 @@ export class WineListComponent implements OnInit {
       for (var i = 0; i < this.wines.length; i++) {
         if (this.wines[i].id == wineId) {
           this.wines.splice(i, 1);
-          console.log('deleted index ' + i)
+          console.log("deleted index " + i);
           break;
         }
       }
-    })
+    });
   }
 
-  @Input()
-  query: string;
+  @Input() query: string;
 
   wines: Wine[] = [];
 }

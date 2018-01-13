@@ -1,113 +1,127 @@
 [
-    {
-        "name": "Amarone",
-        "variety": "amarone",
-        "available": true,
-        "red": true,
-        "description": "This is an assertively full-bodied wine with a delectable nose of black cherries, dark chocolate and well balanced oak. It offers ripe dark fruit flavours cradled by firm tannins culminating in an almost endless finish."
-    },
+  {
+    "name": "Amarone",
+    "variety": "amarone",
+    "available": true,
+    "red": true,
+    "description":
+      "This is an assertively full-bodied wine with a delectable nose of black cherries, dark chocolate and well balanced oak. It offers ripe dark fruit flavours cradled by firm tannins culminating in an almost endless finish."
+  },
 
-    {
-        "name": "Super Tuscan",
-        "variety": "super tuscan",
-        "available": true,
-        "red": true,
-        "description": "Tuscany is home to some of the world's most notable wine regions. Its soil and weather conditions are ideal for grape growing and have long fostered production of the unique Super Tuscan wine style. Balanced acidity and a velvety mouthfeel best describe the En Primeur Super Tuscan. With bursting flavors of plum, cassis, cherry, and red currant, the Super Tuscan also offers subtle notes of leather, spice, and licorice. It pairs perfectly with traditional Italian dishes like tomato-based pasta dishes and buttery roasted game, or try it with an herbed mushroom and white bean salad."
-    },
+  {
+    "name": "Super Tuscan",
+    "variety": "super tuscan",
+    "available": true,
+    "red": true,
+    "description":
+      "Tuscany is home to some of the world's most notable wine regions. Its soil and weather conditions are ideal for grape growing and have long fostered production of the unique Super Tuscan wine style. Balanced acidity and a velvety mouthfeel best describe the En Primeur Super Tuscan. With bursting flavors of plum, cassis, cherry, and red currant, the Super Tuscan also offers subtle notes of leather, spice, and licorice. It pairs perfectly with traditional Italian dishes like tomato-based pasta dishes and buttery roasted game, or try it with an herbed mushroom and white bean salad."
+  },
 
-    {
-        "name": "Chocolate Cherry Port",
-        "variety": "port",
-        "available": true,
-        "red": true,
-        "description": "Bursting with rich aromas of red and dark cherry, this full-flavored Port also has a hint of dark chocolate fused with plum and toasted oak on the nose. Rich and sweet on the palate with an enjoyable warm finish, this dessert in a bottle is an irresistible complement to your holiday festivities."
-    },
+  {
+    "name": "Chocolate Cherry Port",
+    "variety": "port",
+    "available": true,
+    "red": true,
+    "description":
+      "Bursting with rich aromas of red and dark cherry, this full-flavored Port also has a hint of dark chocolate fused with plum and toasted oak on the nose. Rich and sweet on the palate with an enjoyable warm finish, this dessert in a bottle is an irresistible complement to your holiday festivities."
+  },
 
-    {
-        "name": "White Merlot",
-        "variety": "merlot",
-        "available": true,
-        "red": true,
-        "description": "Take Merlot. Make it a blush. Voila - a Merlot like you've never experienced! Fresh strawberries and raspberries abound in the aromas and flavors of this medium-pink rosé style wine, capped by a crisp finish that's slightly drier than a typical blush."
-    },
+  {
+    "name": "White Merlot",
+    "variety": "merlot",
+    "available": true,
+    "red": true,
+    "description":
+      "Take Merlot. Make it a blush. Voila - a Merlot like you've never experienced! Fresh strawberries and raspberries abound in the aromas and flavors of this medium-pink rosé style wine, capped by a crisp finish that's slightly drier than a typical blush."
+  },
 
-    {
-        "name": "Pinot Grigio",
-        "variety": "pinot grigio",
-        "available": true,
-        "red": false,
-        "description": "Refresh yourself with Italy's most popular white wine. Deeply aromatic with ripe pear, lychee and honey on the nose, this wine lures you to take a sip. Beautifully balanced flavours of ripe juicy pear and stone fruit tantalize the palate and lead to an enduring finish."
-    },
+  {
+    "name": "Pinot Grigio",
+    "variety": "pinot grigio",
+    "available": true,
+    "red": false,
+    "description":
+      "Refresh yourself with Italy's most popular white wine. Deeply aromatic with ripe pear, lychee and honey on the nose, this wine lures you to take a sip. Beautifully balanced flavours of ripe juicy pear and stone fruit tantalize the palate and lead to an enduring finish."
+  },
 
-    {
-        "name": "Sonoma Chardonnay",
-        "variety": "chardonnay",
-        "available": true,
-        "red": false,
-        "description": "A fresh, well-balanced wine with typical Chardonnay characteristics of tropical citrus aromas and flavors. Undimmed by oak, the fruit quality of these grapes is allowed to come through, and the rich, round mouthfeel lingers to a long, crisp finish."
-    },
+  {
+    "name": "Sonoma Chardonnay",
+    "variety": "chardonnay",
+    "available": true,
+    "red": false,
+    "description":
+      "A fresh, well-balanced wine with typical Chardonnay characteristics of tropical citrus aromas and flavors. Undimmed by oak, the fruit quality of these grapes is allowed to come through, and the rich, round mouthfeel lingers to a long, crisp finish."
+  },
 
-    {
-        "name": "Luna Bianca",
-        "variety": "luna bianca",
-        "available": true,
-        "red": false,
-        "description": "Winexpert's biggest, boldest white wine ever. In the spirit of the great full-bodied Chardonnays of California and Australia, Luna Bianca is lush, golden and rich. Dense, luscious, buttery aromas dance up from the glass. Flavours of tropical fruits blend with the vanilla-oak backing - a technique usually achieved through barrel fermentation with extended lees (yeast sediment) contact. The high alcohol finished wine is smooth and mouth filling."
-    },
+  {
+    "name": "Luna Bianca",
+    "variety": "luna bianca",
+    "available": true,
+    "red": false,
+    "description":
+      "Winexpert's biggest, boldest white wine ever. In the spirit of the great full-bodied Chardonnays of California and Australia, Luna Bianca is lush, golden and rich. Dense, luscious, buttery aromas dance up from the glass. Flavours of tropical fruits blend with the vanilla-oak backing - a technique usually achieved through barrel fermentation with extended lees (yeast sediment) contact. The high alcohol finished wine is smooth and mouth filling."
+  },
 
-    {
-        "name": "Chile Pinot Noir",
-        "variety": "pinot noir",
-        "available": true,
-        "red": true,
-        "description": "Elevated aromas of plump, red cherries, bitter chocolate and spice define the intense varietal character of this full-bodied wine. Fermented on Hungarian oak cubes and winery grade yeast, it is ruby red in color. The palate is rich and oaky, supported by blackberries and herb flavors layered over silky, integrated tannins."
-    },
+  {
+    "name": "Chile Pinot Noir",
+    "variety": "pinot noir",
+    "available": true,
+    "red": true,
+    "description":
+      "Elevated aromas of plump, red cherries, bitter chocolate and spice define the intense varietal character of this full-bodied wine. Fermented on Hungarian oak cubes and winery grade yeast, it is ruby red in color. The palate is rich and oaky, supported by blackberries and herb flavors layered over silky, integrated tannins."
+  },
 
-    {
-        "name": "Winemaker's Trio",
-        "variety": "blend",
-        "available": true,
-        "red": true,
-        "description": "The Winemaker’s Trio is the perfect blend of Cabernet Sauvignon, Syrah and Zinfandel. This new world style red has a nicely integrated balance of tannins and acidity. It features an inviting blend of vanilla, red berries, and black cherry on the nose and it combines the sweet flavors of ripe raspberry, chocolate, and cherry on the palate."
-    },
+  {
+    "name": "Winemaker's Trio",
+    "variety": "blend",
+    "available": true,
+    "red": true,
+    "description":
+      "The Winemaker’s Trio is the perfect blend of Cabernet Sauvignon, Syrah and Zinfandel. This new world style red has a nicely integrated balance of tannins and acidity. It features an inviting blend of vanilla, red berries, and black cherry on the nose and it combines the sweet flavors of ripe raspberry, chocolate, and cherry on the palate."
+  },
 
-    {
-        "name": "Cabernet Sauvignon",
-        "variety": "cabernet sauvignon",
-        "available": true,
-        "red": true,
-        "description": "This ultra premium Cabernet has the trademark black currant and cherry flavors with a subtle weave of complex compounds that will delight 'Cab' fans."
-    },
+  {
+    "name": "Cabernet Sauvignon",
+    "variety": "cabernet sauvignon",
+    "available": true,
+    "red": true,
+    "description":
+      "This ultra premium Cabernet has the trademark black currant and cherry flavors with a subtle weave of complex compounds that will delight 'Cab' fans."
+  },
 
-    {
-        "name": "Stag's Leap Merlot",
-        "variety": "merlot",
-        "available": true,
-        "red": true,
-        "description": "Harvested from the highly regarded Stag's Leap District on the valley's east bench, this Merlot is dry and medium-bodied with a soft, supple, fruity palate of plums and red berries. Its characteristic spicy aroma, accented with light oak, leads a rich, smooth and mouth-filling flavor experience."
-    },
+  {
+    "name": "Stag's Leap Merlot",
+    "variety": "merlot",
+    "available": true,
+    "red": true,
+    "description":
+      "Harvested from the highly regarded Stag's Leap District on the valley's east bench, this Merlot is dry and medium-bodied with a soft, supple, fruity palate of plums and red berries. Its characteristic spicy aroma, accented with light oak, leads a rich, smooth and mouth-filling flavor experience."
+  },
 
-    {
-        "name": "Eclipse FORZA",
-        "variety": "forza",
-        "available": true,
-        "red": true,
-        "description": "The Region: Veneto, Italy; Located in Northeast Italy, just north of Venice. The Veneto stretches across most of the northern reaches of the Adriatic Sea. The Veneto is known to experience hot summers and cool winters, and thanks to its proximity to the sea, less extreme weather than other Northeastern regions. Silty, sandy soil prevails throughout the Veneto, with influences of clay and calcareous debris. The Veneto produces the most wine in volume in Northeast Italy.; The Wine: Deep ruby color with aromas of plum, smoke and spice. Rich flavors of dark fruit, chocolate, and cedar with lingering oak and a firm, long finish.; Food Pairing: Forza pairs wonderfully with braised meats and rich risottos. Avoid foods with spicy heat which will be amplified by the high alcohol. Choose a dish that is of equal weight so that it is not overpowered by the fullness of the wine."
-    },
+  {
+    "name": "Eclipse FORZA",
+    "variety": "forza",
+    "available": true,
+    "red": true,
+    "description":
+      "The Region: Veneto, Italy; Located in Northeast Italy, just north of Venice. The Veneto stretches across most of the northern reaches of the Adriatic Sea. The Veneto is known to experience hot summers and cool winters, and thanks to its proximity to the sea, less extreme weather than other Northeastern regions. Silty, sandy soil prevails throughout the Veneto, with influences of clay and calcareous debris. The Veneto produces the most wine in volume in Northeast Italy.; The Wine: Deep ruby color with aromas of plum, smoke and spice. Rich flavors of dark fruit, chocolate, and cedar with lingering oak and a firm, long finish.; Food Pairing: Forza pairs wonderfully with braised meats and rich risottos. Avoid foods with spicy heat which will be amplified by the high alcohol. Choose a dish that is of equal weight so that it is not overpowered by the fullness of the wine."
+  },
 
-    {
-        "name": "Washington Triumph Red Blend",
-        "variety": "washington blend",
-        "available": true,
-        "red": true,
-        "description": "Grape growing conditions are almost textbook perfect in the Yakima Valley. It has excellent slopes and sun exposure, good air drainage, large day/night temperature swings, and gravelly soil, along with the Yakima River to moderate the stunning heat of the late growing season—there could hardly be more distinctive terroir.;  A blend of Cabernet Sauvignon, Cabernet Franc and Merlot, the seductive nose of this wine foreshadows magnificent texture and flavour, including cassis, red fruit, plum and cherry notes, vanilla and peppery spice that glides across the palate. The texture and mouthfeel of the wine offers up silky tannins and a velvety smooth structure to go with its full-body.;  The firm tannins and full body make this an excellent food wine, pairing with hearty dishes, including wild mushroom ragu, grilled steak, or even an aged cheddar cheese. ;   This is no simple red: the complexity and structure of this wine will require three to six months to unwind, and it will continue improving after that. Due to the firm tannins it will also benefit from decanting for an hour before serving.;"
-    },
+  {
+    "name": "Washington Triumph Red Blend",
+    "variety": "washington blend",
+    "available": true,
+    "red": true,
+    "description":
+      "Grape growing conditions are almost textbook perfect in the Yakima Valley. It has excellent slopes and sun exposure, good air drainage, large day/night temperature swings, and gravelly soil, along with the Yakima River to moderate the stunning heat of the late growing season—there could hardly be more distinctive terroir.;  A blend of Cabernet Sauvignon, Cabernet Franc and Merlot, the seductive nose of this wine foreshadows magnificent texture and flavour, including cassis, red fruit, plum and cherry notes, vanilla and peppery spice that glides across the palate. The texture and mouthfeel of the wine offers up silky tannins and a velvety smooth structure to go with its full-body.;  The firm tannins and full body make this an excellent food wine, pairing with hearty dishes, including wild mushroom ragu, grilled steak, or even an aged cheddar cheese. ;   This is no simple red: the complexity and structure of this wine will require three to six months to unwind, and it will continue improving after that. Due to the firm tannins it will also benefit from decanting for an hour before serving.;"
+  },
 
-    {
-        "name": "Super Tuscan",
-        "variety": "super tuscan",
-        "available": true,
-        "red": true,
-        "description": "Tuscany lies at the heart of Italian culture, language, literature and arts, and its rolling hills are immortalized in the work of many famous Italian painters. The calcium-rich marl soil combines with endless Tuscan sunshine and cold nights (which help retain intense varietal aromas) to make an ideal wine-growing environment.; In the 1970’s Winemakers in Tuscany broke with traditions of Chianti to create undeniably great wines—the Super Tuscans. They blended Sangiovese with Cabernet Sauvignon for a unique Italian wine with finessed tannins, firm structure and supple fruit. Ironically, although these new Super Tuscan wines became famous (and expensive!) they were made outside the traditional Italian classification and could be sold only as humble ‘vino di tavola’ (table wine)! ; The bright cherry and lively fruit of Sangiovese is matches brilliantly with the firm structure of classic Cabernet Sauvignon. Style is an immediately appealing red that gets better with age. This wine is dark-cherry colour with highlights of pretty, ruby-garnet. Bold, yet supple and expansive enough to be consumed with great pleasure, the big nose of ripe cherry and currant-like fruit is followed by a richly tannic finish.; Driven by structure and tannin, this wine will stand up to full-flavored dishes like spaghetti Bolognese, osso buco or lamb shanks braised in red wine—or try it with fragrant, aged Asiago cheese.;"
-    }
+  {
+    "name": "Super Tuscan",
+    "variety": "super tuscan",
+    "available": true,
+    "red": true,
+    "description":
+      "Tuscany lies at the heart of Italian culture, language, literature and arts, and its rolling hills are immortalized in the work of many famous Italian painters. The calcium-rich marl soil combines with endless Tuscan sunshine and cold nights (which help retain intense varietal aromas) to make an ideal wine-growing environment.; In the 1970’s Winemakers in Tuscany broke with traditions of Chianti to create undeniably great wines—the Super Tuscans. They blended Sangiovese with Cabernet Sauvignon for a unique Italian wine with finessed tannins, firm structure and supple fruit. Ironically, although these new Super Tuscan wines became famous (and expensive!) they were made outside the traditional Italian classification and could be sold only as humble ‘vino di tavola’ (table wine)! ; The bright cherry and lively fruit of Sangiovese is matches brilliantly with the firm structure of classic Cabernet Sauvignon. Style is an immediately appealing red that gets better with age. This wine is dark-cherry colour with highlights of pretty, ruby-garnet. Bold, yet supple and expansive enough to be consumed with great pleasure, the big nose of ripe cherry and currant-like fruit is followed by a richly tannic finish.; Driven by structure and tannin, this wine will stand up to full-flavored dishes like spaghetti Bolognese, osso buco or lamb shanks braised in red wine—or try it with fragrant, aged Asiago cheese.;"
+  }
 ]

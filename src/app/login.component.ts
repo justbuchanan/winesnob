@@ -1,18 +1,18 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { MyAuthenticationService } from './authentication.service';
+import { Component } from "@angular/core";
+import { Router } from "@angular/router";
+import { MyAuthenticationService } from "./authentication.service";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
+  selector: "app-login",
+  templateUrl: "./login.component.html",
   // styleUrls: ['./app.component.css'],
-  providers: [],
+  providers: []
 })
 export class LoginComponent {
   constructor(
     private router: Router,
-    public authService: MyAuthenticationService,
-    ) {}
+    public authService: MyAuthenticationService
+  ) {}
 
   // onLogin() {
   //   console.log('login pressed')

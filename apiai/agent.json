@@ -1,212 +1,222 @@
 {
-    "name": "actionPackages/10743139",
-    "deploymentStatus": {
-        "state": "NEW",
-        "previewEndTime": "2017-01-12T09:08:19.773094Z"
-    },
-    "versionLabel": "API.AI generated package for agent Wine-master-v2",
-    "agentInfo": {
-        "languageCode": "en-US",
-        "projectId": "buchanan-sommolier",
-        "invocationNames": [
-            "wine master"
-        ],
-        "voiceName": "female_2",
-        "logoUrl": "https://static.api.ai/assets/images/logo.png"
-    },
-    "actions": [
+  "name": "actionPackages/10743139",
+  "deploymentStatus": {
+    "state": "NEW",
+    "previewEndTime": "2017-01-12T09:08:19.773094Z"
+  },
+  "versionLabel": "API.AI generated package for agent Wine-master-v2",
+  "agentInfo": {
+    "languageCode": "en-US",
+    "projectId": "buchanan-sommolier",
+    "invocationNames": ["wine master"],
+    "voiceName": "female_2",
+    "logoUrl": "https://static.api.ai/assets/images/logo.png"
+  },
+  "actions": [
+    {
+      "description": "welcome",
+      "initialTrigger": {
+        "intent": "assistant.intent.action.MAIN",
+        "queryPatterns": []
+      },
+      "inDialogTriggers": [
         {
-            "description": "welcome",
-            "initialTrigger": {
-                "intent": "assistant.intent.action.MAIN",
-                "queryPatterns": []
+          "intent": "57eb9428-830e-4558-a2a8-98109d568e17",
+          "queryPatterns": [
+            {
+              "queryPattern":
+                "Do we have any  $SchemaOrg_Text:wine-descriptor ?"
             },
-            "inDialogTriggers": [
-                {
-                    "intent": "57eb9428-830e-4558-a2a8-98109d568e17",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "Do we have any  $SchemaOrg_Text:wine-descriptor ?"
-                        },
-                        {
-                            "queryPattern": "Do you have any  $SchemaOrg_Text:wine-descriptor ?"
-                        },
-                        {
-                            "queryPattern": "Is there any  $SchemaOrg_Text:wine-descriptor ?"
-                        },
-                        {
-                            "queryPattern": "Do we have any  $SchemaOrg_Text:wine-descriptor  left?"
-                        }
-                    ]
-                },
-                {
-                    "intent": "7868c39a-d85c-46cb-bbd6-3e7254f8d253",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "the  $SchemaOrg_Text:wine-descriptor  is gone"
-                        },
-                        {
-                            "queryPattern": "there is no more  $SchemaOrg_Text:wine-descriptor  left"
-                        },
-                        {
-                            "queryPattern": "we ran out of  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "we're out of  $SchemaOrg_Text:wine-descriptor"
-                        }
-                    ]
-                },
-                {
-                    "intent": "7b048d28-0bef-4b61-8e7a-c1cda95e01bc",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "describe the  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "what's up with the  $SchemaOrg_Text:wine-descriptor ?"
-                        },
-                        {
-                            "queryPattern": "how was the  $SchemaOrg_Text:wine-descriptor  made?"
-                        },
-                        {
-                            "queryPattern": "tell me about the  $SchemaOrg_Text:wine-descriptor"
-                        }
-                    ]
-                },
-                {
-                    "intent": "8bc6cfda-1942-437e-a8fc-25f213dfa6ff",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "Which wine should I have with my  $SchemaOrg_Text:food ?"
-                        },
-                        {
-                            "queryPattern": "What wine goes well with  $SchemaOrg_Text:food ?"
-                        },
-                        {
-                            "queryPattern": "Which wine will taste good with  $SchemaOrg_Text:food ?"
-                        },
-                        {
-                            "queryPattern": "Which wine goes best with  $SchemaOrg_Text:food ?"
-                        },
-                        {
-                            "queryPattern": "Which wine  pairs  best with  $SchemaOrg_Text:food ?"
-                        }
-                    ]
-                },
-                {
-                    "intent": "9e2b7c2a-cfb2-4666-95d2-9bc1f7328bca",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "we have some more  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "we just got a bottle of  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "we have a bottle of  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "we have some  $SchemaOrg_Text:wine-descriptor"
-                        },
-                        {
-                            "queryPattern": "there is also some  $SchemaOrg_Text:wine-descriptor"
-                        }
-                    ]
-                },
-                {
-                    "intent": "c02564f4-8fc0-48e0-958b-740e7361bedb",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "fuck"
-                        },
-                        {
-                            "queryPattern": "stop"
-                        },
-                        {
-                            "queryPattern": "thanks"
-                        },
-                        {
-                            "queryPattern": "thank you"
-                        },
-                        {
-                            "queryPattern": "cancel"
-                        },
-                        {
-                            "queryPattern": "that's enough"
-                        }
-                    ]
-                },
-                {
-                    "intent": "c992b164-0da1-4562-a6ce-f1ea5fcf9a79",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "what do we have?"
-                        },
-                        {
-                            "queryPattern": "What's in the cellar?"
-                        },
-                        {
-                            "queryPattern": "What do we have in stock?"
-                        },
-                        {
-                            "queryPattern": "what wines do we have?"
-                        },
-                        {
-                            "queryPattern": "What  $wine-type:wine-type  wines do you have?"
-                        },
-                        {
-                            "queryPattern": "What wines do you have?"
-                        },
-                        {
-                            "queryPattern": "Tell me what wines we have"
-                        },
-                        {
-                            "queryPattern": "Tell me what we have"
-                        },
-                        {
-                            "queryPattern": "What  $wine-type:wine-type  wines are there?"
-                        },
-                        {
-                            "queryPattern": "What  $wine-type:wine-type  wines are available?"
-                        },
-                        {
-                            "queryPattern": "What wines are available?"
-                        }
-                    ]
-                },
-                {
-                    "intent": "RAW_TEXT",
-                    "queryPatterns": [
-                        {
-                            "queryPattern": "$SchemaOrg_Text:text"
-                        }
-                    ]
-                }
-            ],
-            "httpExecution": {
-                "url": "https://api.api.ai/api/integrations/google?token=c89b66f8b91d45fd8b4a4fb5cc3d873f&lang=en-US"
+            {
+              "queryPattern":
+                "Do you have any  $SchemaOrg_Text:wine-descriptor ?"
             },
-            "signInRequired": false
-        }
-    ],
-    "customTypes": [
+            {
+              "queryPattern": "Is there any  $SchemaOrg_Text:wine-descriptor ?"
+            },
+            {
+              "queryPattern":
+                "Do we have any  $SchemaOrg_Text:wine-descriptor  left?"
+            }
+          ]
+        },
         {
-            "name": "$wine-type",
-            "items": [
-                {
-                    "key": "white",
-                    "synonyms": [
-                        "white"
-                    ]
-                },
-                {
-                    "key": "red",
-                    "synonyms": [
-                        "red"
-                    ]
-                }
-            ],
-            "isDynamicDefined": true
+          "intent": "7868c39a-d85c-46cb-bbd6-3e7254f8d253",
+          "queryPatterns": [
+            {
+              "queryPattern": "the  $SchemaOrg_Text:wine-descriptor  is gone"
+            },
+            {
+              "queryPattern":
+                "there is no more  $SchemaOrg_Text:wine-descriptor  left"
+            },
+            {
+              "queryPattern": "we ran out of  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern": "we're out of  $SchemaOrg_Text:wine-descriptor"
+            }
+          ]
+        },
+        {
+          "intent": "7b048d28-0bef-4b61-8e7a-c1cda95e01bc",
+          "queryPatterns": [
+            {
+              "queryPattern": "describe the  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern":
+                "what's up with the  $SchemaOrg_Text:wine-descriptor ?"
+            },
+            {
+              "queryPattern":
+                "how was the  $SchemaOrg_Text:wine-descriptor  made?"
+            },
+            {
+              "queryPattern":
+                "tell me about the  $SchemaOrg_Text:wine-descriptor"
+            }
+          ]
+        },
+        {
+          "intent": "8bc6cfda-1942-437e-a8fc-25f213dfa6ff",
+          "queryPatterns": [
+            {
+              "queryPattern":
+                "Which wine should I have with my  $SchemaOrg_Text:food ?"
+            },
+            {
+              "queryPattern": "What wine goes well with  $SchemaOrg_Text:food ?"
+            },
+            {
+              "queryPattern":
+                "Which wine will taste good with  $SchemaOrg_Text:food ?"
+            },
+            {
+              "queryPattern":
+                "Which wine goes best with  $SchemaOrg_Text:food ?"
+            },
+            {
+              "queryPattern":
+                "Which wine  pairs  best with  $SchemaOrg_Text:food ?"
+            }
+          ]
+        },
+        {
+          "intent": "9e2b7c2a-cfb2-4666-95d2-9bc1f7328bca",
+          "queryPatterns": [
+            {
+              "queryPattern":
+                "we have some more  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern":
+                "we just got a bottle of  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern":
+                "we have a bottle of  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern": "we have some  $SchemaOrg_Text:wine-descriptor"
+            },
+            {
+              "queryPattern":
+                "there is also some  $SchemaOrg_Text:wine-descriptor"
+            }
+          ]
+        },
+        {
+          "intent": "c02564f4-8fc0-48e0-958b-740e7361bedb",
+          "queryPatterns": [
+            {
+              "queryPattern": "fuck"
+            },
+            {
+              "queryPattern": "stop"
+            },
+            {
+              "queryPattern": "thanks"
+            },
+            {
+              "queryPattern": "thank you"
+            },
+            {
+              "queryPattern": "cancel"
+            },
+            {
+              "queryPattern": "that's enough"
+            }
+          ]
+        },
+        {
+          "intent": "c992b164-0da1-4562-a6ce-f1ea5fcf9a79",
+          "queryPatterns": [
+            {
+              "queryPattern": "what do we have?"
+            },
+            {
+              "queryPattern": "What's in the cellar?"
+            },
+            {
+              "queryPattern": "What do we have in stock?"
+            },
+            {
+              "queryPattern": "what wines do we have?"
+            },
+            {
+              "queryPattern": "What  $wine-type:wine-type  wines do you have?"
+            },
+            {
+              "queryPattern": "What wines do you have?"
+            },
+            {
+              "queryPattern": "Tell me what wines we have"
+            },
+            {
+              "queryPattern": "Tell me what we have"
+            },
+            {
+              "queryPattern": "What  $wine-type:wine-type  wines are there?"
+            },
+            {
+              "queryPattern": "What  $wine-type:wine-type  wines are available?"
+            },
+            {
+              "queryPattern": "What wines are available?"
+            }
+          ]
+        },
+        {
+          "intent": "RAW_TEXT",
+          "queryPatterns": [
+            {
+              "queryPattern": "$SchemaOrg_Text:text"
+            }
+          ]
         }
-    ]
+      ],
+      "httpExecution": {
+        "url":
+          "https://api.api.ai/api/integrations/google?token=c89b66f8b91d45fd8b4a4fb5cc3d873f&lang=en-US"
+      },
+      "signInRequired": false
+    }
+  ],
+  "customTypes": [
+    {
+      "name": "$wine-type",
+      "items": [
+        {
+          "key": "white",
+          "synonyms": ["white"]
+        },
+        {
+          "key": "red",
+          "synonyms": ["red"]
+        }
+      ],
+      "isDynamicDefined": true
+    }
+  ]
 }

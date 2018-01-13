@@ -1,38 +1,38 @@
 [
-    {
-        "name": "2011 amarone",
-        "available": true,
-        "red": true
-    },
+  {
+    "name": "2011 amarone",
+    "available": true,
+    "red": true
+  },
 
-    {
-        "name": "2013 amarone",
-        "available": true,
-        "red": true
-    },
+  {
+    "name": "2013 amarone",
+    "available": true,
+    "red": true
+  },
 
-    {
-        "name": "amarone",
-        "available": true,
-        "red": true,
-        "description": "Amarone description"
-    },
+  {
+    "name": "amarone",
+    "available": true,
+    "red": true,
+    "description": "Amarone description"
+  },
 
-    {
-        "name": "chardonnay",
-        "available": true,
-        "red": false
-    },
+  {
+    "name": "chardonnay",
+    "available": true,
+    "red": false
+  },
 
-    {
-        "name": "cabernet sauvignon",
-        "available": true,
-        "red": true
-    },
+  {
+    "name": "cabernet sauvignon",
+    "available": true,
+    "red": true
+  },
 
-    {
-        "name": "chiraz",
-        "available": false,
-        "red": true
-    }
+  {
+    "name": "chiraz",
+    "available": false,
+    "red": true
+  }
 ]
