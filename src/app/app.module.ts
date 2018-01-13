@@ -9,15 +9,14 @@ import {
   HttpModule,
   ConnectionBackend
 } from "@angular/http";
-import { MdCardModule } from "@angular/material/card";
-import { MdToolbarModule } from "@angular/material/toolbar";
-import { MdButtonModule } from "@angular/material/button";
-import { MdIconModule, MdIconRegistry } from "@angular/material/icon";
-import { MdInputModule } from "@angular/material/input";
-import { MdCheckboxModule } from "@angular/material/checkbox";
+import { MatCardModule } from "@angular/material/card";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule, MatIconRegistry } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { NgPipesModule } from "ng-pipes";
-import { MaterialModule } from "@angular/material";
-import { MdDialogModule } from "@angular/material/dialog";
+import { MatDialogModule } from "@angular/material/dialog";
 import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { Angular2FontawesomeModule } from "angular2-fontawesome/angular2-fontawesome";
@@ -29,7 +28,7 @@ import { WineListComponent } from "./wine-list/wine-list.component";
 import { WineService } from "./wine.service";
 
 import { ExtendedHttpService } from "./extended-http.service";
-import { MyAuthenticationService } from "./authentication.service";
+import { AuthenticationService } from "./authentication.service";
 
 import { LoginComponent } from "./login.component";
 
@@ -60,24 +59,22 @@ export function httpFactory(
     BrowserModule,
     FormsModule,
     HttpModule,
-    MdCardModule,
-    MdDialogModule,
-    MdToolbarModule,
-    MdButtonModule,
-    MdIconModule,
-    MdInputModule,
-    MdCheckboxModule,
+    MatCardModule,
+    MatDialogModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
+    MatCheckboxModule,
     RouterModule.forRoot(appRoutes),
     NgPipesModule,
-    MaterialModule,
-    MaterialModule.forRoot(),
-    FlexLayoutModule.forRoot(),
+    FlexLayoutModule,
     Angular2FontawesomeModule
   ],
   providers: [
-    MdIconRegistry,
+    MatIconRegistry,
     WineService,
-    MyAuthenticationService,
+    AuthenticationService,
     {
       provide: ExtendedHttpService,
       useFactory: httpFactory,

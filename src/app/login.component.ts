@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
-import { MyAuthenticationService } from "./authentication.service";
+import { AuthenticationService } from "./authentication.service";
 
 @Component({
   selector: "app-login",
@@ -11,7 +11,7 @@ import { MyAuthenticationService } from "./authentication.service";
 export class LoginComponent {
   constructor(
     private router: Router,
-    public authService: MyAuthenticationService
+    public authService: AuthenticationService
   ) {}
 
   // onLogin() {

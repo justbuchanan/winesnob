@@ -2,18 +2,18 @@
 <div class="flex-item">
 
 
-<md-toolbar [color]="primary" class="header">
+<mat-toolbar [color]="primary" class="header">
     <span>{{title}}</span>
     
     <span style="flex: 1 1 auto;"></span>
 
-    <md-icon>search</md-icon>
-    <md-input [(ngModel)]="query" placeholder='Search'></md-input>
+    <mat-icon>search</mat-icon>
+    <input matInput [(ngModel)]="query" placeholder='Search'>
 
     <span style="flex: 1 1 auto;"></span>
 
-    <a md-button [color]="warn" href="/oauth2/logout">Logout</a>
-</md-toolbar>
+    <a mat-button [color]="warn" href="/oauth2/logout">Logout</a>
+</mat-toolbar>
 
 <div class="content-container">
 
@@ -27,14 +27,14 @@
     <!-- <router-outlet></router-outlet> -->
 </div>
 
-<md-toolbar [color]="warm" class="footer">
+<mat-toolbar [color]="warm" class="footer">
     <a class="github" href="https://github.com/justbuchanan/winesnob">
         <fa name="github" [border]=false></fa>
     </a>
 
     <span style="flex: 1 1 auto;"></span>
-    <a md-button id="add-button" routerLink="/create"><md-icon>add</md-icon></a>
-</md-toolbar>
+    <a mat-button id="add-button" routerLink="/create"><mat-icon>add</mat-icon></a>
+</mat-toolbar>
 
 
 </div>

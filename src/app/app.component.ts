@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { Wine } from "./wine";
 import { Router } from "@angular/router";
 
-import { MyAuthenticationService } from "./authentication.service";
+import { Wine } from "./wine";
+import { AuthenticationService } from "./authentication.service";
 
 @Component({
   selector: "app-root",
@@ -13,7 +13,7 @@ import { MyAuthenticationService } from "./authentication.service";
 export class AppComponent implements OnInit {
   constructor(
     private router: Router,
-    private authService: MyAuthenticationService
+    private authService: AuthenticationService
   ) {}
 
   ngOnInit(): void {
