@@ -23,7 +23,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-const SESSION_NAME = "cellar"
+const WinesnobSessionName = "cellar"
 
 type WineInfo struct {
 	Name        string `json:"name"`
@@ -53,7 +53,7 @@ type Env struct {
 	GoogleOauth2Config oauth2.Config
 	AllowedUsers       []string
 
-	authenticate_everyone_as string // only use for testing
+	authenticateEveryoneAs string // only use for testing
 }
 
 func (env *Env) CreateHTTPHandler() http.Handler {
@@ -232,9 +232,9 @@ func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 
 	const debug = false
 
-	const WORST_ACCEPTABLE = 6
+	const WorstAcceptable = 6
 	var bestMatch WineInfo
-	bestMatchR := WORST_ACCEPTABLE
+	bestMatchR := WorstAcceptable
 
 	if debug {
 		fmt.Println("Looking for", descriptor)
@@ -250,12 +250,12 @@ func (env *Env) WineDescriptorLookup(descriptor string) *WineInfo {
 		}
 	}
 
-	if bestMatchR < WORST_ACCEPTABLE {
+	if bestMatchR < WorstAcceptable {
 		if debug {
 			fmt.Println("Found:", bestMatch.Name)
 		}
 		return &bestMatch
-	} else {
-		return nil
 	}
+
+	return nil
 }

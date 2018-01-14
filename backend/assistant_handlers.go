@@ -126,10 +126,10 @@ func (env *Env) IntentWineQuery(req apiai.ActionRequest) *apiai.ActionResponse {
 		return &apiai.ActionResponse{
 			Speech: "Yes, we do have " + wine.Name,
 		}
-	} else {
-		return &apiai.ActionResponse{
-			Speech: "No, we don't have any of the " + wine.Name + " available",
-		}
+	}
+
+	return &apiai.ActionResponse{
+		Speech: "No, we don't have any of the " + wine.Name + " available",
 	}
 }
 

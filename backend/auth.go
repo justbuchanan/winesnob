@@ -63,11 +63,11 @@ type GoogleOauth2Result struct {
 
 func (env *Env) CheckLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	// fake auth - only for testing
-	if env.authenticate_everyone_as != "" {
+	if env.authenticateEveryoneAs != "" {
 		return true
 	}
 
-	session, err := env.store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, WinesnobSessionName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,12 +83,12 @@ func (env *Env) CheckLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 func (env *Env) LoginStatusHandler(w http.ResponseWriter, r *http.Request) {
 	var email string
 
-	if env.authenticate_everyone_as != "" {
+	if env.authenticateEveryoneAs != "" {
 		// mock auth for testing
-		email = env.authenticate_everyone_as
+		email = env.authenticateEveryoneAs
 	} else {
 		// check session cookie
-		sess, err := env.store.Get(r, SESSION_NAME)
+		sess, err := env.store.Get(r, WinesnobSessionName)
 		if err != nil {
 			SendError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -113,7 +113,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handleGoogleCallback")
 
 	// get session
-	session, err := env.store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, WinesnobSessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -156,7 +156,7 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	session, err := env.store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, WinesnobSessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -171,7 +171,7 @@ func (env *Env) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (env *Env) handleGoogleLogout(w http.ResponseWriter, r *http.Request) {
-	session, err := env.store.Get(r, SESSION_NAME)
+	session, err := env.store.Get(r, WinesnobSessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

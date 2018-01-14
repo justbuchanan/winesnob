@@ -51,7 +51,7 @@ func TestFakeAuthentication(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	env.authenticate_everyone_as = "justbuchanan@gmail.com" // fake auth
+	env.authenticateEveryoneAs = "justbuchanan@gmail.com" // fake auth
 
 	var res *http.Response
 	res, err = http.DefaultClient.Do(req)
@@ -67,7 +67,7 @@ func TestLoginStatus(t *testing.T) {
 	env, ts, cleanup := SetupTestServer(t)
 	defer cleanup()
 
-	env.authenticate_everyone_as = "drunk@cellar.edu"
+	env.authenticateEveryoneAs = "drunk@cellar.edu"
 	res, err := http.Get(ts.URL + "/oauth2/login-status")
 	if err != nil {
 		t.Fatal(err)
@@ -81,7 +81,7 @@ func TestLoginStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("obj: ", obj)
-	assert.Equal(t, env.authenticate_everyone_as, obj["email"])
+	assert.Equal(t, env.authenticateEveryoneAs, obj["email"])
 }
 
 func TestLoginStatusWhenUnauthenticated(t *testing.T) {
@@ -99,7 +99,7 @@ func TestCreate(t *testing.T) {
 	env, ts, cleanup := SetupTestServer(t)
 	defer cleanup()
 
-	env.authenticate_everyone_as = "someone"
+	env.authenticateEveryoneAs = "someone"
 
 	// send request to create a wine
 	wineToCreate := WineInfo{
