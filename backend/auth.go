@@ -137,7 +137,11 @@ func (env *Env) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
-
+	if err != nil {
+		fmt.Println("Bad response from google oauth2")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 
