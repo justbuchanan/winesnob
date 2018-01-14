@@ -1,32 +1,63 @@
-machine:
-  environment:
-    GOPATH: $HOME/.go_workspace
-    PATH: $PATH:$GOPATH/bin
-    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+version: 2
+jobs:
+    build:
+        working_directory: /go/src/github.com/justbuchanan/winesnob
+        docker:
+            - image: justbuchanan/docker-archlinux
+        steps:
+            # setup GOPATH
+            - run: echo 'export GOPATH=/go' >> $BASH_ENV
+            - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
 
-dependencies:
-  override:
-    - go get -t -d -v ./...
-    - go get -u github.com/golang/lint/golint
-    - go get -u github.com/mattn/goveralls
-    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
-    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+            - run: echo 'export CIRCLE_ARTIFACTS=/tmp/artifacts' >> $BASH_ENV
+            - run: mkdir -p $CIRCLE_ARTIFACTS
 
-test:
-  pre:
-    - go vet ./...
+            # install deps
+            - run: pacman -Sy --noconfirm go git yarn gcc
+            - run: yarn global add prettier @angular/cli
+            - run: |
+                     go get -u github.com/bazelbuild/buildtools/buildifier \
+                                github.com/golang/lint/golint \
+                                github.com/justbuchanan/ci-status \
+                                github.com/justbuchanan/stylize \
+                                golang.org/x/tools/cmd/cover \
+                                github.com/mattn/goveralls
 
-    # golint output should be blank - ignore messages about commenting everything...
-    - golint ./... | grep -v "should have comment" > $CIRCLE_ARTIFACTS/lint-report.txt
+            - checkout
 
-    # fail if file is non-empty
-    - ! test -s $CIRCLE_ARTIFACTS/lint-report.txt
+            # setup git
+            - run: git config --global user.email "ci@circle"
+            - run: git config --global user.name "Circle Ci"
 
-  override:
-    - cd $GOPATH/src/$IMPORT_PATH/backend; go test -coverprofile=$CIRCLE_ARTIFACTS/coverage.txt .
+            # install go deps
+            - run: go get -t -v ./...
 
-    # coverage html report
-    - cd $GOPATH/src/$IMPORT_PATH/backend; go tool cover -html=$CIRCLE_ARTIFACTS/coverage.txt -o $CIRCLE_ARTIFACTS/coverage.html
+            # install frontend deps
+            - run: yarn install
 
-    # upload coverage
-    - cd $GOPATH/src/$IMPORT_PATH/backend; goveralls -coverprofile=$CIRCLE_ARTIFACTS/coverage.txt -service=circle-ci -repotoken=$COVERALLS_TOKEN
+            # TODO: ci-status
+            # golint output should be blank - ignore messages about commenting everything...
+            - run: golint ./... | grep -v "comment on" | grep -v "should have comment" > $CIRCLE_ARTIFACTS/lint-report.txt || true
+
+            # fail if file is non-empty
+            - run: ci-status --context golint --description "golint output should be empty" "! test -s $CIRCLE_ARTIFACTS/lint-report.txt" || true
+
+            - run: ci-status --context build --description "go build" "go build -o ws ./backend"
+
+            - run: ci-status --context checkstyle --description "run stylize" "stylize --patch_output $CIRCLE_ARTIFACTS/pretty.patch" || true
+
+            - run: ci-status --context tests --description "go test" "go test -v -covermode=count -coverprofile=coverage.out ./backend"
+            - run: ci-status -h --context coverage_upload --description "upload coverage with goveralls" "goveralls -coverprofile=coverage.out -service=circle-ci -repotoken $COVERALLS_TOKEN"
+
+            - run: ci-status --context vet --description "go vet" "go vet ./backend" || true
+
+            - run: ci-status --context ng-build --description "Compile frontend" "ng build"
+
+            - store_artifacts:
+                path: /tmp/artifacts
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build
